@@ -3,18 +3,18 @@ using System;
 namespace KintaiSystem.Models
 {
     /// <summary>
-    /// CSVo—Í—pƒf[ƒ^“]‘—ƒIƒuƒWƒFƒNƒgi1Ğˆõ‚ÌŒŠÔWŒvî•ñj
+    /// CSVå‡ºåŠ›ç”¨ãƒ‡ãƒ¼ã‚¿è»¢é€ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆï¼ˆ1ç¤¾å“¡ã®æœˆé–“é›†è¨ˆæƒ…å ±ï¼‰
     /// </summary>
     public class MonthlySummaryCsvDto
     {
-        public string EmployeeNumber { get; set; } = string.Empty; // Ğˆõ”Ô† (—á: E0001)
-        public string Name { get; set; } = string.Empty;           // –¼
-        public string TargetYearMonth { get; set; } = string.Empty;// ‘ÎÛ”NŒ (—á: 2026-10)
-        public int WorkDays { get; set; }                          // o‹Î“ú”
-        public int HolidayWorkDays { get; set; }                   // ‹x“úo‹Î“ú”
-        public int TotalWorkMinutes { get; set; }                 // ‘˜J“­ŠÔi•ª’PˆÊj
-        public int TotalOvertimeMinutes { get; set; }             // ‘c‹ÆŠÔi•ª’PˆÊj
-        public int TotalMidnightMinutes { get; set; }             // ‘[–éŠÔi•ª’PˆÊj
-        public int TotalHolidayWorkMinutes { get; set; }         // ‘‹x“ú˜J“­ŠÔi•ª’PˆÊj
+        public string EmployeeNumber { get; set; } = string.Empty; // ç¤¾å“¡ç•ªå· (ä¾‹: E0001)
+        public string Name { get; set; } = string.Empty;           // æ°å
+        public string TargetYearMonth { get; set; } = string.Empty;// å¯¾è±¡å¹´æœˆ (ä¾‹: 2026-10)
+        public int WorkDays { get; set; }                          // å‡ºå‹¤æ—¥æ•°
+        public int HolidayWorkDays { get; set; }                   // ä¼‘æ—¥å‡ºå‹¤æ—¥æ•°
+        public int TotalWorkMinutes { get; set; }                 // ç·åŠ´åƒæ™‚é–“ï¼ˆåˆ†å˜ä½ï¼‰
+        public int TotalOvertimeMinutes { get; set; }             // ç·æ®‹æ¥­æ™‚é–“ï¼ˆåˆ†å˜ä½ï¼‰
+        public int TotalMidnightMinutes { get; set; }             // ç·æ·±å¤œæ™‚é–“ï¼ˆåˆ†å˜ä½ï¼‰
+        public int TotalHolidayWorkMinutes { get; set; }         // ç·ä¼‘æ—¥åŠ´åƒæ™‚é–“ï¼ˆåˆ†å˜ä½ï¼‰
     }
 }

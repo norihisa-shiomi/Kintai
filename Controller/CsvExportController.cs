@@ -10,7 +10,7 @@ namespace KintaiSystem.Controllers
     public class CsvExportController : ControllerBase
     {
         private readonly KintaiCsvService _csvService;
-        private readonly IKintaiRepository _repository; // DBƒAƒNƒZƒX—pƒŠƒ|ƒWƒgƒŠ‘z’è
+        private readonly IKintaiRepository _repository; // DBã‚¢ã‚¯ã‚»ã‚¹ç”¨ãƒªãƒã‚¸ãƒˆãƒªæƒ³å®š
 
         public CsvExportController(KintaiCsvService csvService, IKintaiRepository repository)
         {
@@ -19,47 +19,47 @@ namespace KintaiSystem.Controllers
         }
 
         /// <summary>
-        /// w’è‚³‚ê‚½‘ÎÛ”NŒ‚Ì‹‹—^ŒvZ—pCSV‚ğo—Í‚µ‚Ü‚· (SC-11)
+        /// æŒ‡å®šã•ã‚ŒãŸå¯¾è±¡å¹´æœˆã®çµ¦ä¸è¨ˆç®—ç”¨CSVã‚’å‡ºåŠ›ã—ã¾ã™ (SC-11)
         /// </summary>
-        /// <param name="targetYearMonth">‘ÎÛ”NŒ (Œ`®: YYYY-MM —á: 2026-10)</param>
+        /// <param name="targetYearMonth">å¯¾è±¡å¹´æœˆ (å½¢å¼: YYYY-MM ä¾‹: 2026-10)</param>
         [HttpGet("download")]
         public async Task<IActionResult> DownloadSalaryCsv([FromQuery] string targetYearMonth)
         {
             try
             {
-                // 1. ŠÇ—ÒŒ ŒÀƒ`ƒFƒbƒN (‘æ10Í F08 / 11-4)
-                bool isAdmin = User.IsInRole("Admin"); // ƒZƒbƒVƒ‡ƒ“/ƒg[ƒNƒ“î•ñ‚æ‚è”»’è
+                // 1. ç®¡ç†è€…æ¨©é™ãƒã‚§ãƒƒã‚¯ (ç¬¬10ç«  F08 / 11-4)
+                bool isAdmin = User.IsInRole("Admin"); // ã‚»ãƒƒã‚·ãƒ§ãƒ³/ãƒˆãƒ¼ã‚¯ãƒ³æƒ…å ±ã‚ˆã‚Šåˆ¤å®š
                 if (!isAdmin)
                 {
-                    // E-0024: ƒAƒNƒZƒXŒ ‚ª‚ ‚è‚Ü‚¹‚ñB
-                    return StatusCode(403, new { messageId = "E-0024", message = "ƒAƒNƒZƒXŒ ‚ª‚ ‚è‚Ü‚¹‚ñB" });
+                    // E-0024: ã‚¢ã‚¯ã‚»ã‚¹æ¨©ãŒã‚ã‚Šã¾ã›ã‚“ã€‚
+                    return StatusCode(403, new { messageId = "E-0024", message = "ã‚¢ã‚¯ã‚»ã‚¹æ¨©ãŒã‚ã‚Šã¾ã›ã‚“ã€‚" });
                 }
 
-                // 2. ‘ÎÛŒ‚ÌŒ’÷‚ßó‘Ôƒ`ƒFƒbƒN (‘O’ñ No.12 / 11-3 / SC-11)
+                // 2. å¯¾è±¡æœˆã®æœˆç· ã‚çŠ¶æ…‹ãƒã‚§ãƒƒã‚¯ (å‰æ No.12 / 11-3 / SC-11)
                 bool isClosed = await _repository.IsMonthClosedAsync(targetYearMonth);
                 if (!isClosed)
                 {
-                    // E-0020: ŠY“–Œ‚Í‚·‚Å‚É’÷‚ßˆ—‚ªŠ®—¹‚µ‚Ä‚¢‚È‚¢A‚Ü‚½‚Í–¢’÷‚ßƒGƒ‰[
-                    return BadRequest(new { messageId = "E-0020", message = "‘ÎÛ”NŒ‚ª’÷‚ßŠ®—¹‚µ‚Ä‚¢‚È‚¢‚½‚ßACSV‚ğo—Í‚Å‚«‚Ü‚¹‚ñB’÷‚ßˆ—‚ğs‚Á‚Ä‚­‚¾‚³‚¢B" });
+                    // E-0020: è©²å½“æœˆã¯ã™ã§ã«ç· ã‚å‡¦ç†ãŒå®Œäº†ã—ã¦ã„ãªã„ã€ã¾ãŸã¯æœªç· ã‚ã‚¨ãƒ©ãƒ¼
+                    return BadRequest(new { messageId = "E-0020", message = "å¯¾è±¡å¹´æœˆãŒç· ã‚å®Œäº†ã—ã¦ã„ãªã„ãŸã‚ã€CSVã‚’å‡ºåŠ›ã§ãã¾ã›ã‚“ã€‚ç· ã‚å‡¦ç†ã‚’è¡Œã£ã¦ãã ã•ã„ã€‚" });
                 }
 
-                // 3. ‘SĞˆõ‚ÌWŒvƒf[ƒ^‚ğæ“¾i‘SĞˆõ‚ğæ“¾EĞˆõ”Ô†¸‡E‹Î–±‚È‚µĞˆõ‚Í0‹l‚ßj (‘O’ñ No.13)
+                // 3. å…¨ç¤¾å“¡ã®é›†è¨ˆãƒ‡ãƒ¼ã‚¿ã‚’å–å¾—ï¼ˆå…¨ç¤¾å“¡ã‚’å–å¾—ãƒ»ç¤¾å“¡ç•ªå·æ˜‡é †ãƒ»å‹¤å‹™ãªã—ç¤¾å“¡ã¯0è©°ã‚ï¼‰ (å‰æ No.13)
                 var summaries = await _repository.GetMonthlySummariesForCsvAsync(targetYearMonth);
 
-                // 4. CSVƒf[ƒ^¶¬ (UTF-8 BOM•t‚«, CRLF)
+                // 4. CSVãƒ‡ãƒ¼ã‚¿ç”Ÿæˆ (UTF-8 BOMä»˜ã, CRLF)
                 byte[] csvBytes = _csvService.GenerateSalaryCsv(summaries);
 
-                // 5. ƒtƒ@ƒCƒ‹–¼ì¬: kintai_202610.csv (‘O’ñ No.13 / 7-1)
+                // 5. ãƒ•ã‚¡ã‚¤ãƒ«åä½œæˆ: kintai_202610.csv (å‰æ No.13 / 7-1)
                 string formattedYearMonth = targetYearMonth.Replace("-", ""); // "2026-10" -> "202610"
                 string fileName = $"kintai_{formattedYearMonth}.csv";
 
-                // Content-Type: text/csv ‚Åƒ_ƒEƒ“ƒ[ƒhƒŒƒXƒ|ƒ“ƒX•Ô‹p
+                // Content-Type: text/csv ã§ãƒ€ã‚¦ãƒ³ãƒ­ãƒ¼ãƒ‰ãƒ¬ã‚¹ãƒãƒ³ã‚¹è¿”å´
                 return File(csvBytes, "text/csv; charset=utf-8", fileName);
             }
             catch (Exception ex)
             {
-                // E-0026 / E-0025: CSVo—ÍƒGƒ‰[
-                return StatusCode(500, new { messageId = "E-0026", message = "CSVo—Íˆ—’†‚ÉƒGƒ‰[‚ª”­¶‚µ‚Ü‚µ‚½B" });
+                // E-0026 / E-0025: CSVå‡ºåŠ›ã‚¨ãƒ©ãƒ¼
+                return StatusCode(500, new { messageId = "E-0026", message = "CSVå‡ºåŠ›å‡¦ç†ä¸­ã«ã‚¨ãƒ©ãƒ¼ãŒç™ºç”Ÿã—ã¾ã—ãŸã€‚" });
             }
         }
     }
