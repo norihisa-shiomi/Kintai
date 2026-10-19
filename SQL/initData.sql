@@ -1,0 +1,112 @@
+-- ====================================================================
+-- 勤怠管理システム 全テーブル初期データ＆マスターデータ投入スクリプト
+-- （INSERT OR REPLACE 対応版：何度実行しても重複エラーになりません）
+-- ====================================================================
+
+-- --------------------------------------------------------------------
+-- 1. 会社休日テーブル (company_holidays) - 2026年度 祝日＆土日
+-- --------------------------------------------------------------------
+INSERT OR REPLACE INTO company_holidays (holiday_date, holiday_name) VALUES
+-- 2026年 祝日・振替休日・国民の休日
+('2026-01-01', '元日'),
+('2026-01-12', '成人の日'),
+('2026-02-11', '建国記念の日'),
+('2026-02-23', '天皇誕生日'),
+('2026-03-20', '春分の日'),
+('2026-04-29', '昭和の日'),
+('2026-05-03', '憲法記念日'),
+('2026-05-04', 'みどりの日'),
+('2026-05-05', 'こどもの日'),
+('2026-05-06', '振替休日'),
+('2026-07-20', '海の日'),
+('2026-08-11', '山の日'),
+('2026-09-21', '敬老の日'),
+('2026-09-22', '国民の休日'),
+('2026-09-23', '秋分の日'),
+('2026-10-12', 'スポーツの日'),
+('2026-11-03', '文化の日'),
+('2026-11-23', '勤労感謝の日'),
+
+-- 2026年 10月 土日データ (検証月用)
+('2026-10-03', '土曜日'),
+('2026-10-04', '日曜日'),
+('2026-10-10', '土曜日'),
+('2026-10-11', '日曜日'),
+('2026-10-17', '土曜日'),
+('2026-10-18', '日曜日'),
+('2026-10-24', '土曜日'),
+('2026-10-25', '日曜日'),
+('2026-10-31', '土曜日');
+
+-- --------------------------------------------------------------------
+-- 2. 社員テーブル (employees)
+-- --------------------------------------------------------------------
+INSERT OR REPLACE INTO employees (id, employee_number, name, email, password_hash, is_admin, is_first_login) VALUES
+(1, 'E0001', '愛染 管理者', 'aizen@tsubame.co.jp', '$2a$10$e8Z9K1...hashed_admin_pass', 1, 0), -- 管理者 (SC-03/08/09/10/11)
+(2, 'E0002', '山田 太郎',   'yamada@tsubame.co.jp', '$2a$10$x9P2M4...hashed_user_pass',  0, 0), -- 一般社員 (計算検証用)
+(3, 'E0003', '佐藤 花子',   'satoh@tsubame.co.jp',  '$2a$10$q1W3E5...hashed_user_pass',  0, 1), -- 初回ログイン用 (SC-02)
+(4, 'E0004', '鈴木 一郎',   'suzuki@tsubame.co.jp', '$2a$10$a9S8D7...hashed_user_pass',  0, 0); -- 勤務実績0件検証用 (CSV0埋め)
+
+-- --------------------------------------------------------------------
+-- 3. 日次勤務 (daily_attendances) & 休憩時間 (break_times)
+-- 6-2章の計算ルール検証用データ（山田太郎: id=2 に投入）
+-- --------------------------------------------------------------------
+-- No.1: 2026-10-05（月）標準定時勤務 (09:00〜18:00, 休憩1h)
+INSERT OR REPLACE INTO daily_attendances (id, employee_id, work_date, day_of_week, clock_in_time, clock_out_time, break_time, work_hours, overtime_hours, midnight_hours, holiday_work_hours, current_status) VALUES
+(1, 2, '2026-10-05', '月', '09:00', '18:00', '01:00', '08:00', '00:00', '00:00', '00:00', 'left_work');
+
+INSERT OR REPLACE INTO break_times (id, daily_attendance_id, break_start_time, break_end_time) VALUES 
+(1, 1, '12:00', '13:00');
+
+-- No.2: 2026-10-06（火）拘束6時間ちょうど (09:00〜15:00, 休憩なし)
+INSERT OR REPLACE INTO daily_attendances (id, employee_id, work_date, day_of_week, clock_in_time, clock_out_time, break_time, work_hours, overtime_hours, midnight_hours, holiday_work_hours, current_status) VALUES
+(2, 2, '2026-10-06', '火', '09:00', '15:00', '00:00', '06:00', '00:00', '00:00', '00:00', 'left_work');
+
+-- No.3: 2026-10-07（水）拘束6時間1分・法定休憩自動補正 (09:00〜15:01, 休憩自動控除45分)
+INSERT OR REPLACE INTO daily_attendances (id, employee_id, work_date, day_of_week, clock_in_time, clock_out_time, break_time, work_hours, overtime_hours, midnight_hours, holiday_work_hours, current_status) VALUES
+(3, 2, '2026-10-07', '水', '09:00', '15:01', '00:01', '06:00', '00:00', '00:00', '00:00', 'left_work');
+
+-- No.7: 2026-10-13（火）平日残業境界値 (09:00〜18:01, 実働8時間1分 -> 残業0:01)
+INSERT OR REPLACE INTO daily_attendances (id, employee_id, work_date, day_of_week, clock_in_time, clock_out_time, break_time, work_hours, overtime_hours, midnight_hours, holiday_work_hours, current_status) VALUES
+(4, 2, '2026-10-13', '火', '09:00', '18:01', '01:00', '08:00', '00:01', '00:00', '00:00', 'left_work');
+
+INSERT OR REPLACE INTO break_times (id, daily_attendance_id, break_start_time, break_end_time) VALUES 
+(2, 4, '12:00', '13:00');
+
+-- No.12: 2026-10-23（金）日またぎ・残業・深夜重複 (09:00〜翌02:00)
+INSERT OR REPLACE INTO daily_attendances (id, employee_id, work_date, day_of_week, clock_in_time, clock_out_time, break_time, work_hours, overtime_hours, midnight_hours, holiday_work_hours, current_status) VALUES
+(5, 2, '2026-10-23', '金', '09:00', '02:00', '01:00', '08:00', '08:00', '04:00', '00:00', 'left_work');
+
+INSERT OR REPLACE INTO break_times (id, daily_attendance_id, break_start_time, break_end_time) VALUES 
+(3, 5, '12:00', '13:00');
+
+-- No.13: 2026-10-24（土）休日労働 (09:00〜18:00, 休日8h)
+INSERT OR REPLACE INTO daily_attendances (id, employee_id, work_date, day_of_week, clock_in_time, clock_out_time, break_time, work_hours, overtime_hours, midnight_hours, holiday_work_hours, current_status) VALUES
+(6, 2, '2026-10-24', '土', '09:00', '18:00', '01:00', '00:00', '00:00', '00:00', '08:00', 'left_work');
+
+INSERT OR REPLACE INTO break_times (id, daily_attendance_id, break_start_time, break_end_time) VALUES 
+(4, 6, '12:00', '13:00');
+
+-- --------------------------------------------------------------------
+-- 4. 月次集計テーブル (monthly_summaries) 初期データ
+-- --------------------------------------------------------------------
+INSERT OR REPLACE INTO monthly_summaries (id, employee_id, target_year_month, work_days, holiday_work_days, total_work_hours, total_overtime_hours, total_midnight_hours, total_holiday_work_hours, lock_status) VALUES
+(1, 1, '2026-10', 20, 0, '160:00', '00:00', '00:00', '00:00', '締め済み'),
+(2, 2, '2026-10', 20, 1, '168:30', '08:15', '04:00', '08:00', '締め済み'),
+(3, 3, '2026-10', 21, 0, '168:00', '00:00', '00:00', '00:00', '締め済み'),
+(4, 4, '2026-10',  0, 0,   '0:00',  '0:00',  '0:00',  '0:00', '締め済み'); -- 勤務なし社員 (前提 No.13)
+
+-- --------------------------------------------------------------------
+-- 5. 月次締めテーブル (monthly_closings) 初期データ
+-- --------------------------------------------------------------------
+INSERT OR REPLACE INTO monthly_closings (id, target_year_month) VALUES
+(1, '2026-10');
+
+-- --------------------------------------------------------------------
+-- 6. 修正申請 (modification_requests) & 申請休憩時間 (requested_break_times) テストデータ
+-- --------------------------------------------------------------------
+INSERT OR REPLACE INTO modification_requests (id, employee_id, daily_attendance_id, request_type, requested_clock_in_time, requested_clock_out_time, status, reason) VALUES
+(1, 2, 1, 'update', '09:00', '19:00', 'pending', '打刻漏れのため1時間残業を申請します');
+
+INSERT OR REPLACE INTO requested_break_times (id, modification_request_id, break_start_time, break_end_time) VALUES
+(1, 1, '12:00', '13:00');
