@@ -160,22 +160,38 @@ INSERT OR REPLACE INTO company_holidays (holiday_date, holiday_name) VALUES
     ('2026-10-04', '日曜日'),
     ('2026-10-10', '土曜日'),
     ('2026-10-11', '日曜日'),
+    ('2026-10-25', '日曜日'),
     ('2026-10-17', '土曜日'),
     ('2026-10-18', '日曜日'),
     ('2026-10-24', '土曜日'),
     ('2026-10-25', '日曜日'),
-    ('2026-10-31', '土曜日');
+    ('2026-10-31', '土曜日'),
+    ('2026-11-01', '日曜日'),
+    ('2026-11-07', '土曜日'),
+    ('2026-11-08', '日曜日'),
+    ('2026-11-14', '土曜日'),
+    ('2026-11-15', '日曜日'),
+    ('2026-11-21', '土曜日'),
+    ('2026-11-22', '日曜日'),
+    ('2026-11-28', '土曜日'),
+    ('2026-11-29', '日曜日'),
+    ('2026-12-05', '土曜日'),
+    ('2026-12-06', '日曜日'),
+    ('2026-12-12', '土曜日'),
+    ('2026-12-13', '日曜日'),
+    ('2026-12-19', '土曜日'),
+    ('2026-12-20', '日曜日');
 
 -- 2. 社員マスターデータ
 INSERT OR REPLACE INTO employees (id, employee_number, name, email, password_hash, is_admin, is_first_login) VALUES
-    (1, 'E0001', '小田切 誠',   'odagiri@tsubame-note.example',       '1234567890', 1, 0),
-    (2, 'E0002', '浅見 さやか', 'asami@tsubame-note.example',         '1234567890', 0, 1),
-    (3, 'E0003', '久遠 拓海',   'kuon@tsubame-note.example',          '1234567890', 0, 0),
-    (4, 'E0004', '早乙女 陽菜', 'saotome@tsubame-note.example',       '1234567890', 1, 0),
-    (5, 'E0005', '鳴海 大地',   'narumi@tsubame-note.example',        '1234567890', 1, 0),
-    (6, 'E1000', '藍染友愛',    'aizen.tomoka@tsubame-note.example',  '1234567890', 1, 0),
-    (7, 'E1001', '下垣海斗',    'shitagaki@tsubame-note.example',     '1234567890', 1, 0),
-    (8, 'E0102', '塩見宜久',    'shiomi@tsubame-note.example',        '1234567890', 1, 0);
+    (1, 'E0001', '小田切 誠',   'odagiri@tsubame-note.example',       '$2a$10$e8Z9K1X2Y3Z4A5B6C7D8E.fG1H2I3J4K5L6M7N8O9P0Q1R2S3T4U5', 1, 0),
+    (2, 'E0002', '浅見 さやか', 'asami@tsubame-note.example',         '$2a$10$e8Z9K1X2Y3Z4A5B6C7D8E.fG1H2I3J4K5L6M7N8O9P0Q1R2S3T4U5', 1, 1),
+    (3, 'E0003', '久遠 拓海',   'kuon@tsubame-note.example',          '$2a$10$e8Z9K1X2Y3Z4A5B6C7D8E.fG1H2I3J4K5L6M7N8O9P0Q1R2S3T4U5', 0, 1),
+    (4, 'E0004', '早乙女 陽菜', 'saotome@tsubame-note.example',       '$2a$10$e8Z9K1X2Y3Z4A5B6C7D8E.fG1H2I3J4K5L6M7N8O9P0Q1R2S3T4U5', 0, 1),
+    (5, 'E0005', '鳴海 大地',   'narumi@tsubame-note.example',        '$2a$10$e8Z9K1X2Y3Z4A5B6C7D8E.fG1H2I3J4K5L6M7N8O9P0Q1R2S3T4U5', 0, 1),
+    (6, 'E1000', '藍染友愛',    'aizen.tomoka@tsubame-note.example',  '$2a$10$e8Z9K1X2Y3Z4A5B6C7D8E.fG1H2I3J4K5L6M7N8O9P0Q1R2S3T4U5', 0, 1),
+    (7, 'E1001', '下垣海斗',    'shitagaki@tsubame-note.example',     '$2a$10$e8Z9K1X2Y3Z4A5B6C7D8E.fG1H2I3J4K5L6M7N8O9P0Q1R2S3T4U5', 0, 1),
+    (8, 'E1002', '塩見宜久',    'shiomi@tsubame-note.example',        '$2a$10$e8Z9K1X2Y3Z4A5B6C7D8E.fG1H2I3J4K5L6M7N8O9P0Q1R2S3T4U5', 0, 1);
 
 -- 3. 日次勤務 & 休憩時間データ（社員ID: 2 用）
 INSERT OR REPLACE INTO daily_attendances (id, employee_id, work_date, day_of_week, clock_in_time, clock_out_time, break_time, work_hours, overtime_hours, midnight_hours, holiday_work_hours, current_status) VALUES
