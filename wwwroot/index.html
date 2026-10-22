@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>打刻 | 勤怠管理システム</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="css/kintai.css">
+</head>
+<body class="bg-light">
+
+<div class="container py-4" style="max-width: 650px;">
+    <!-- ヘッダーエリア -->
+    <div class="d-flex justify-content-between align-items-center mb-3 bg-white p-3 rounded shadow-sm">
+        <div>
+            <span class="text-muted fs-7">ログインユーザー:</span>
+            <strong id="login-user-name" class="ms-1">山田 太郎</strong>
+            <span id="admin-badge" class="badge bg-danger ms-2">管理者</span>
+        </div>
+        <button id="btn-logout" class="btn btn-outline-secondary btn-sm">ログアウト</button>
+    </div>
+
+    <!-- 打刻メインカード (SC-04) -->
+    <div class="card shadow-sm border-0 mb-4">
+        <div class="card-header bg-primary text-white py-3">
+            <h5 class="mb-0 fw-bold">SC-04 打刻</h5>
+        </div>
+        <div class="card-body text-center p-4">
+
+            <!-- 1. サーバー現在時刻表示 -->
+            <div class="mb-3 p-3 bg-light rounded border">
+                <div class="text-muted small fw-bold mb-1">サーバー現在時刻</div>
+                <div id="server-clock" class="display-6 font-monospace fw-bold text-dark">
+                    2026/10/21 17:32:00
+                </div>
+            </div>
+
+            <!-- 2. 勤務状態表示 -->
+            <div class="mb-4">
+                <span class="text-muted fw-bold">現在の状態: </span>
+                <span id="status-badge" class="badge fs-5 px-3 py-2 bg-secondary">
+                    勤務前
+                </span>
+            </div>
+
+            <!-- メッセージ表示エリア -->
+            <div id="alert-success" class="alert alert-success d-none py-2 mb-3" role="alert"></div>
+            <div id="alert-error" class="alert alert-danger d-none py-2 mb-3 text-start" role="alert"></div>
+
+            <!-- 3. 打刻ボタン群 -->
+            <div class="row g-3 mb-4">
+                <div class="col-6">
+                    <button id="btn-clock-in" class="btn btn-primary w-100 py-3 fw-bold fs-5 shadow-sm">
+                        出勤
+                    </button>
+                </div>
+                <div class="col-6">
+                    <button id="btn-clock-out" class="btn btn-danger w-100 py-3 fw-bold fs-5 shadow-sm" disabled>
+                        退勤
+                    </button>
+                </div>
+                <div class="col-6">
+                    <button id="btn-break-start" class="btn btn-warning text-dark w-100 py-3 fw-bold fs-5 shadow-sm" disabled>
+                        休憩開始
+                    </button>
+                </div>
+                <div class="col-6">
+                    <button id="btn-break-end" class="btn btn-info text-white w-100 py-3 fw-bold fs-5 shadow-sm" disabled>
+                        休憩終了
+                    </button>
+                </div>
+            </div>
+
+            <hr class="my-4" />
+
+            <!-- 4. 画面遷移リンク -->
+            <div class="d-flex justify-content-center gap-2 flex-wrap">
+                <a href="#" class="btn btn-outline-primary btn-sm">月次一覧</a>
+                <a href="#" class="btn btn-outline-primary btn-sm">申請履歴一覧</a>
+                <a href="#" id="link-monthly-summary" class="btn btn-outline-danger btn-sm admin-only">月次集計（管理者）</a>
+                <a href="#" id="link-user-admin" class="btn btn-outline-danger btn-sm admin-only">ユーザー管理（管理者）</a>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- 5. 当日打刻履歴 -->
+    <div class="card shadow-sm border-0">
+        <div class="card-header bg-white py-3 fw-bold border-bottom">
+            当日の打刻履歴
+        </div>
+        <div class="card-body p-0">
+            <table class="table table-hover mb-0 text-center align-middle">
+                <thead class="table-light">
+                    <tr>
+                        <th>種別</th>
+                        <th>打刻時刻</th>
+                    </tr>
+                </thead>
+                <tbody id="history-list">
+                    <tr id="no-history-row">
+                        <td colspan="2" class="text-muted py-3">本日の打刻データはありません</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<script src="js/timestamp.js"></script>
+</body>
+</html>
