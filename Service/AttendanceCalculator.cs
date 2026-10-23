@@ -46,6 +46,9 @@ namespace Kintai.Services
             TimeSpan netWorkTime = boundTime - effectiveBreak;
             if (netWorkTime < TimeSpan.Zero) netWorkTime = TimeSpan.Zero;
 
+            // 労働時間（実労働時間をそのままセット）
+            result.WorkHours = netWorkTime;
+
             // 4. 深夜時間の算出 (22:00 ～ 05:00)
             TimeSpan midnight = CalculateMidnightHours(clockIn, clockOut, breakStamp);
             result.MidnightHours = midnight;
@@ -53,24 +56,22 @@ namespace Kintai.Services
             // 5. 休日労働 vs 平日労働・残業
             if (isHoliday)
             {
-                result.WorkHours = netWorkTime;         // ★休日でも実労働時間としてセット（例: 9:00）
-                result.HolidayWorkHours = netWorkTime;  // 休日労働時間にもセット（例: 9:00）
-                result.OvertimeHours = TimeSpan.Zero;   // 休日は残業なし（すべて休日労働に集約）
+                result.HolidayWorkHours = netWorkTime;
+                result.OvertimeHours = TimeSpan.Zero;
             }
             else
             {
                 result.HolidayWorkHours = TimeSpan.Zero;
                 if (netWorkTime.TotalHours > 8)
                 {
-                    result.WorkHours = TimeSpan.FromHours(8);
                     result.OvertimeHours = netWorkTime - TimeSpan.FromHours(8);
                 }
                 else
                 {
-                    result.WorkHours = netWorkTime;
                     result.OvertimeHours = TimeSpan.Zero;
                 }
             }
+
             return result;
         }
 
@@ -93,14 +94,12 @@ namespace Kintai.Services
             double midnightMinutes = 0;
             DateTime current = inTime;
 
-            // 休憩時間が渡されている場合、日付を出勤時間に合わせて調整
             (DateTime Start, DateTime End)? adjustedBreak = null;
             if (breakStamp.HasValue)
             {
                 DateTime bStart = breakStamp.Value.Start;
                 DateTime bEnd = breakStamp.Value.End;
 
-                // 休憩開始が出勤時刻より前の時刻になっている場合、翌日の時刻として補正
                 if (bStart < inTime)
                 {
                     bStart = bStart.AddDays(1);
