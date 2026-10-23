@@ -21,13 +21,43 @@ namespace KintaiSystem.Services
         {
             var today = stampTime.Date;
 
-            // 当日の勤務データを取得（存在しなければ生成）
+            // 1. 当日の勤務データを取得
             var attendance = _context.DailyAttendances
                 .Include(a => a.BreakTimes)
                 .FirstOrDefault(a => a.EmployeeId == employeeId && a.WorkDate == today);
 
+            // 2. 退勤打刻の場合で当日のデータがない（または勤務前）場合は、過去の未退勤データを検索（徹夜勤務・日跨ぎ対応）
+            if (stampType == "退勤" && (attendance == null || attendance.CurrentStatus == "勤務前"))
+            {
+                var lastUnclosedAttendance = _context.DailyAttendances
+                    .Include(a => a.BreakTimes)
+                    .Where(a => a.EmployeeId == employeeId && a.WorkDate < today && a.ClockInTime != null && a.ClockOutTime == null)
+                    .OrderByDescending(a => a.WorkDate)
+                    .FirstOrDefault();
+
+                if (lastUnclosedAttendance != null)
+                {
+                    attendance = lastUnclosedAttendance;
+                }
+            }
+
+            // 【E-0016】月次締め完了チェック
+            if (attendance != null && attendance.IsClosed)
+            {
+                return (false, "E-0016: 対象年月が締め完了状態のため、打刻処理を行えません。");
+            }
+
             if (attendance == null)
             {
+                // 【E-0011】前回の出勤に対する退勤が行われていないかチェック
+                var hasUnclosedClockIn = _context.DailyAttendances
+                    .Any(a => a.EmployeeId == employeeId && a.WorkDate < today && a.ClockInTime != null && a.ClockOutTime == null);
+
+                if (hasUnclosedClockIn && stampType == "出勤")
+                {
+                    return (false, "E-0011: 前回の出勤に対する退勤打刻が行われていません。");
+                }
+
                 attendance = new DailyAttendance
                 {
                     EmployeeId = employeeId,
@@ -39,7 +69,7 @@ namespace KintaiSystem.Services
                 _context.SaveChanges();
             }
 
-            // 打刻種別ごとのステータスチェック（エラー判定）
+            // 打刻種別ごとのステータスチェック
             switch (stampType)
             {
                 case "出勤":
@@ -56,6 +86,13 @@ namespace KintaiSystem.Services
                     {
                         return (false, "E-0012: 現在の勤務状態では退勤打刻は行えません。");
                     }
+
+                    // 【E-0013】24時間超過チェック
+                    if (attendance.ClockInTime.HasValue && (stampTime - attendance.ClockInTime.Value).TotalHours >= 24)
+                    {
+                        return (false, "E-0013: 出勤時刻から24時間以上経過しているため退勤打刻を行えません。");
+                    }
+
                     attendance.CurrentStatus = "退勤済み";
                     attendance.ClockOutTime = stampTime;
                     break;
@@ -90,7 +127,6 @@ namespace KintaiSystem.Services
                     return (false, "不正な打刻種別です。");
             }
 
-            // 打刻ログの追加
             _context.TimeStamps.Add(new TimeStamp
             {
                 EmployeeId = employeeId,
