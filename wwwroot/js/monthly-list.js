@@ -1,134 +1,115 @@
-// 既存の打刻・実績データのサンプル（DBから取得するイメージ）
-const attendanceRecords = {
-    "2026-10-01": { in: "09:00", out: "18:00", bStart: "12:00", bEnd: "13:00", work: "8:00", over: "0:00", mid: "0:00", hol: "0:00" },
-    "2026-10-02": { in: "09:00", out: "18:00", bStart: "12:00", bEnd: "13:00", work: "8:00", over: "0:00", mid: "0:00", hol: "0:00" },
-    "2026-10-05": { in: "09:00", out: "18:00", bStart: "12:00", bEnd: "13:00", work: "8:00", over: "0:00", mid: "0:00", hol: "0:00" },
-    "2026-10-13": { in: "09:00", out: "18:01", bStart: "12:00", bEnd: "13:00", work: "8:01", over: "0:01", mid: "0:00", hol: "0:00" },
-    "2026-10-15": { in: "13:00", out: "22:01", bStart: "17:00", bEnd: "18:00", work: "8:01", over: "0:01", mid: "0:01", hol: "0:00" },
-    "2026-10-24": { in: "09:00", out: "19:00", bStart: "12:00", bEnd: "13:00", work: "9:00", over: "0:00", mid: "0:00", hol: "9:00" },
-    "2026-10-25": { in: "18:00", out: "02:00", bStart: "21:00", bEnd: "22:00", work: "7:00", over: "0:00", mid: "4:00", hol: "7:00" },
-};
+// 対象社員ID（固定値、またはログイン情報から取得する仕様）
+const currentEmployeeId = 1;
 
-const weekDays = ["日", "月", "火", "水", "木", "金", "土"];
-let isClosedMonth = false;
+/**
+ * サーバーの月次勤怠APIを呼び出し、画面に描画する
+ */
+async function loadMonthlyData() {
+    const monthPicker = document.getElementById("monthPicker");
+    if (!monthPicker) return;
 
-// "HH:mm" 形式の文字列を「分」に変換する関数
-function parseTimeToMinutes(timeStr) {
-    if (!timeStr || timeStr === "0:00" || timeStr === "-") return 0;
-    const [hours, minutes] = timeStr.split(":").map(Number);
-    return hours * 60 + minutes;
-}
+    const selectedMonth = monthPicker.value || "2026-10";
+    const [year, month] = selectedMonth.split("-").map(Number);
 
-// 「分」を "H:mm" 形式の文字列に変換する関数
-function formatMinutesToTime(totalMinutes) {
-    const hours = Math.floor(totalMinutes / 60);
-    const minutes = totalMinutes % 60;
-    return `${hours}:${String(minutes).padStart(2, "0")}`;
+    try {
+        // バックエンドの AttendanceController (GET /api/attendance/monthly) を呼び出し
+        const response = await fetch(`/api/attendance/monthly?employeeId=${currentEmployeeId}&year=${year}&month=${month}`);
+        
+        if (!response.ok) {
+            throw new Error(`APIエラー: ステータス ${response.status}`);
+        }
+
+        const data = await response.json();
+        
+        // 取得したデータを画面に反映
+        renderView(data);
+
+    } catch (error) {
+        console.error("月次データの取得に失敗しました:", error);
+        alert("月次データの取得に失敗しました。サーバーの起動状態を確認してください。");
+    }
 }
 
 /**
- * テーブル描画 ＆ 月次集計（日数・各時間）の自動計算
+ * APIから返ってきた MonthlyAttendanceResponseDto の内容を画面に描画
  */
-function renderMonthlyTable(yearMonthStr) {
+function renderView(data) {
+    // 1. 社員名・締め状態の反映
+    const employeeNameElem = document.getElementById("employeeName");
+    if (employeeNameElem && data.employeeName) {
+        employeeNameElem.innerText = data.employeeName;
+    }
+
+    const lockStatusTextElem = document.getElementById("lockStatusText");
+    const lockStatusBadgeElem = document.getElementById("lockStatusBadge");
+
+    if (lockStatusTextElem) {
+        lockStatusTextElem.innerText = data.lockStatus;
+    }
+    if (lockStatusBadgeElem) {
+        lockStatusBadgeElem.className = data.isClosed ? "status-badge closed" : "status-badge open";
+    }
+
+    // 2. 上部サマリー（合計日数・合計時間）の反映
+    document.getElementById("summaryWorkDays").innerText = `${data.workDays} 日`;
+    document.getElementById("summaryHolidayDays").innerText = `${data.holidayWorkDays} 日`;
+    document.getElementById("summaryTotalHours").innerText = data.totalWorkHours;
+    document.getElementById("summaryOvertime").innerText = data.totalOvertimeHours;
+    document.getElementById("summaryMidnight").innerText = data.totalMidnightHours;
+    document.getElementById("summaryHolidayHours").innerText = data.totalHolidayWorkHours;
+
+    // 3. テーブル（一覧明細）の描画
     const tbody = document.getElementById("attendanceTableBody");
     if (!tbody) return;
-    
+
     tbody.innerHTML = "";
 
-    const [year, month] = yearMonthStr.split("-").map(Number);
-    const daysInMonth = new Date(year, month, 0).getDate();
+    const isClosed = data.isClosed;
+    const disabledAttr = isClosed ? "disabled title='締め完了済みのため修正申請不可'" : "";
 
-    // 集計用カウンターの初期化
-    let workDaysCount = 0;         // 出勤日数（平日）
-    let holidayDaysCount = 0;      // 休日出勤日数
-    let totalWorkMinutes = 0;      // 総労働時間（分）
-    let totalOvertimeMinutes = 0;  // 総残業時間（分）
-    let totalMidnightMinutes = 0;  // 総深夜時間（分）
-    let totalHolidayMinutes = 0;   // 総休日労働時間（分）
-
-    for (let day = 1; day <= daysInMonth; day++) {
-        const dateStr = `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
-        const dateObj = new Date(year, month - 1, day);
-        const dayOfWeekIndex = dateObj.getDay(); // 0:日, 6:土
-        const dayOfWeekStr = weekDays[dayOfWeekIndex];
-        const isWeekend = (dayOfWeekIndex === 0 || dayOfWeekIndex === 6);
-
-        const record = attendanceRecords[dateStr] || {};
-        const hasWorked = !!(record.in || record.out); // 出勤実績があるか
-
-        // --- 自動カウント＆時間の集計ロジック（設計書 第6章・6-3準拠） ---
-        if (hasWorked) {
-            if (isWeekend) {
-                holidayDaysCount++; // 休日出勤日数
-            } else {
-                workDaysCount++;    // 平日出勤日数
-            }
-        }
-
-        // 各時間の合計（分）を加算
-        totalWorkMinutes += parseTimeToMinutes(record.work);
-        totalOvertimeMinutes += parseTimeToMinutes(record.over);
-        totalMidnightMinutes += parseTimeToMinutes(record.mid);
-        totalHolidayMinutes += parseTimeToMinutes(record.hol);
-
-        // --- 行の生成 ---
+    data.dailyList.forEach(item => {
         const tr = document.createElement("tr");
-        if (dayOfWeekIndex === 6) tr.className = "sat";
-        if (dayOfWeekIndex === 0) tr.className = "sun";
 
-        const displayDate = `${String(month).padStart(2, '0')}/${String(day).padStart(2, '0')}`;
-        const disabledAttr = isClosedMonth ? "disabled title='締め完了済みのため修正申請不可'" : "";
+        // 土日の色分け
+        if (item.dayOfWeek === "土") tr.className = "sat";
+        if (item.dayOfWeek === "日") tr.className = "sun";
 
         tr.innerHTML = `
-            <td>${displayDate}</td>
-            <td>${dayOfWeekStr}</td>
-            <td>${record.in || "-"}</td>
-            <td>${record.out || "-"}</td>
-            <td>${record.bStart || "-"}</td>
-            <td>${record.bEnd || "-"}</td>
-            <td><strong>${record.work || "0:00"}</strong></td>
-            <td>${record.over || "0:00"}</td>
-            <td>${record.mid || "0:00"}</td>
-            <td>${record.hol || "0:00"}</td>
+            <td>${item.displayDate}</td>
+            <td>${item.dayOfWeek}</td>
+            <td>${item.clockInTime || "-"}</td>
+            <td>${item.clockOutTime || "-"}</td>
+            <td>${item.breakStartTime || "-"}</td>
+            <td>${item.breakEndTime || "-"}</td>
+            <td><strong>${item.workHours || "0:00"}</strong></td>
+            <td>${item.overtimeHours || "0:00"}</td>
+            <td>${item.midnightHours || "0:00"}</td>
+            <td>${item.holidayWorkHours || "0:00"}</td>
             <td>
-                <button class="btn-apply" ${disabledAttr} onclick="goToApply('${dateStr}')">
+                <button class="btn-apply" ${disabledAttr} onclick="goToApply('${item.workDate}')">
                     修正申請
                 </button>
             </td>
         `;
         tbody.appendChild(tr);
-    }
-
-    // --- 画面上部サマリーへの自動反映 (SC-05-12〜17) ---
-    document.getElementById("summaryWorkDays").innerText = `${workDaysCount} 日`;
-    document.getElementById("summaryHolidayDays").innerText = `${holidayDaysCount} 日`;
-    document.getElementById("summaryTotalHours").innerText = formatMinutesToTime(totalWorkMinutes);
-    document.getElementById("summaryOvertime").innerText = formatMinutesToTime(totalOvertimeMinutes);
-    document.getElementById("summaryMidnight").innerText = formatMinutesToTime(totalMidnightMinutes);
-    document.getElementById("summaryHolidayHours").innerText = formatMinutesToTime(totalHolidayMinutes);
+    });
 }
 
+/**
+ * 年月セレクター変更時イベント
+ */
+function updateMonthlyData() {
+    loadMonthlyData();
+}
+
+/**
+ * 修正申請画面への遷移
+ */
 function goToApply(dateStr) {
     alert(`${dateStr} の修正申請画面（SC-07）へ遷移します。`);
 }
 
-function updateMonthlyData() {
-    const selectedMonth = document.getElementById("monthPicker").value;
-    
-    if (selectedMonth < "2026-10") {
-        isClosedMonth = true;
-        document.getElementById("lockStatusText").innerText = "締め済み（ロック）";
-        document.getElementById("lockStatusBadge").className = "status-badge closed";
-    } else {
-        isClosedMonth = false;
-        document.getElementById("lockStatusText").innerText = "未締め（編集可）";
-        document.getElementById("lockStatusBadge").className = "status-badge open";
-    }
-
-    renderMonthlyTable(selectedMonth);
-}
-
+// 画面読み込み完了時に実行
 document.addEventListener("DOMContentLoaded", () => {
-    const defaultMonth = document.getElementById("monthPicker").value || "2026-10";
-    renderMonthlyTable(defaultMonth);
+    loadMonthlyData();
 });
