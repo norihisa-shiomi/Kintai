@@ -11,6 +11,7 @@ namespace KintaiSystem.Controllers
     {
         private readonly LoginService _loginService;
 
+        //エラーコードに対応する文言定義辞書
         private static readonly Dictionary<string, string> ErrorMessages = new()
         {
             { "E-0001", "入力内容をご確認のうえ、再度入力してください。" },
@@ -19,20 +20,21 @@ namespace KintaiSystem.Controllers
             { "E-0004", "パスワードは指定された形式（英大文字・小文字・数字を含む形式等）で入力してください。入力内容をご確認のうえ、再度入力してください。" },
             { "E-0005", "メールアドレスまたはパスワードに誤りがあります。正しく入力されているかご確認のうえ、再度お試しください。" },
             { "E-0006", "パスワードと確認用パスワードが一致していません。両方に同じパスワードを入力してください。" },
+        };
 
         public LoginController(LoginService loginService)
         {
             _loginService = loginService;
         }
 
-        // 設計: SC-01 ログイン画面初期表示 (アクション名を Login に変更)
+        //ログイン画面初期表示
         [HttpGet]
         public IActionResult Login()
         {
             return View(new LoginViewModel());
         }
 
-        // 設計: ログインボタン押下時の認証処理 (アクション名を Login に変更)
+        //ログインボタン押下時の認証処理
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Login(LoginViewModel model)
@@ -59,6 +61,7 @@ namespace KintaiSystem.Controllers
                 new Claim(ClaimTypes.Role, result.Employee.IsAdmin ? "Admin" : "User")
             };
 
+            //サインイン処理 (認証クッキー発行)
             var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
 
             await HttpContext.SignInAsync(
@@ -71,8 +74,8 @@ namespace KintaiSystem.Controllers
                 return RedirectToAction("Index", "FirstLogin");
             }
 
-            // 打刻画面への遷移 (※打刻用HTML/View側のルーティング先に合わせて調整)
-            return Redirect("/timestamp.html"); // または打刻用のViewルーティング
+            //打刻画面への遷移
+            return Redirect("/index.html"); 
         }
 
         [HttpPost]

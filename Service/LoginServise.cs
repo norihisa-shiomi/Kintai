@@ -2,7 +2,6 @@ using KintaiSystem.Data;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using KintaiSystem.Models.Entities;
-using YourProjectName.Models;
 
 namespace KintaiSystem.Services
 {
