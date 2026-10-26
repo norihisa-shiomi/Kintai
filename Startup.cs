@@ -10,7 +10,10 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Identity;
 using KintaiSystem.Data;
+using KintaiSystem.Models.Entities;
 using KintaiSystem.Services;
 
 namespace Kintai
@@ -29,11 +32,21 @@ namespace Kintai
         {
             services.Configure<CookiePolicyOptions>(options =>
             {
-                options.CheckConsentNeeded = context => true;
-                options.MinimumSameSitePolicy = SameSiteMode.None;
+                // false に設定してログイン認証クッキーが常にブラウザに書き込まれるようにする
+                options.CheckConsentNeeded = context => false;
+                options.MinimumSameSitePolicy = SameSiteMode.Lax;
             });
 
-            // EndpointRouting をオフにして従来型のルーティングを許可する設定を追加
+            // クッキー認証の設定
+            services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+                .AddCookie(options =>
+                {
+                    options.LoginPath = "/Login/Index"; // 未ログイン時のリダイレクト先
+                    options.LogoutPath = "/Login/Logout";
+                    options.ExpireTimeSpan = TimeSpan.FromHours(8);
+                });
+
+            // EndpointRouting をオフにして従来型のルーティングを許可する設定
             services.AddMvc(options => options.EnableEndpointRouting = false)
                     .SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
 
@@ -41,9 +54,14 @@ namespace Kintai
             services.AddDbContext<AppDbContext>(options =>
                 options.UseSqlite("Data Source=kintai.db"));
 
-            // 2. 打刻サービスの登録
+            // 2. パスワードハッシュ照合用サービスの登録
+            services.AddScoped<IPasswordHasher<Employee>, PasswordHasher<Employee>>();
+
+            // 3. ログインサービスおよび打刻サービスの登録
+            services.AddScoped<LoginService>();
             services.AddScoped<AttendanceService>();
         }
+
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env, AppDbContext context)
         {
@@ -55,11 +73,14 @@ namespace Kintai
             app.UseStaticFiles();
             app.UseCookiePolicy();
 
+            // 認証ミドルウェア (必ず UseMvc より前)
+            app.UseAuthentication();
+
             app.UseMvc(routes =>
             {
                 routes.MapRoute(
                     name: "default",
-                    template: "{controller=Home}/{action=Index}/{id?}");
+                    template: "{controller=Login}/{action=Index}/{id?}"); // 初期画面をログイン画面に設定
             });
 
             // アプリ起動時に DB 作成とテスト社員の登録を実行
