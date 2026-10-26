@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace YourProjectName.Models
+namespace KintaiSystem.Models.Entities
 {
     public class LoginViewModel
     {

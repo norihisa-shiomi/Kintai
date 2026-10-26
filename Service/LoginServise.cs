@@ -1,3 +1,4 @@
+using KintaiSystem.Data;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using KintaiSystem.Models.Entities;
@@ -35,9 +36,7 @@ namespace KintaiSystem.Services
             _passwordHasher = passwordHasher;
         }
 
-        /// <summary>
-        /// ログイン処理メインエントリーポイント 
-        /// </summary>
+        /// ログイン処理 
         public async Task<LoginResult> AuthenticateAsync(LoginViewModel model)
         {
             // 1. 入力値検証 

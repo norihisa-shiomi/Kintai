@@ -1,5 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 
+
 namespace YourProjectName.Models.ViewModels
 {
     public class FirstLoginViewModel
