@@ -30,18 +30,18 @@ namespace Kintai
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            // 認証クッキーがブラウザに正しく書き込まれるよう設定
             services.Configure<CookiePolicyOptions>(options =>
             {
-                // false に設定してログイン認証クッキーが常にブラウザに書き込まれるようにする
                 options.CheckConsentNeeded = context => false;
                 options.MinimumSameSitePolicy = SameSiteMode.Lax;
             });
 
-            // クッキー認証の設定
+            // クッキー認証の設定（未ログイン時は /Login/Login へリダイレクト）
             services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
                 .AddCookie(options =>
                 {
-                    options.LoginPath = "/Login/Index"; // 未ログイン時のリダイレクト先
+                    options.LoginPath = "/Login/Login";
                     options.LogoutPath = "/Login/Logout";
                     options.ExpireTimeSpan = TimeSpan.FromHours(8);
                 });
@@ -70,17 +70,26 @@ namespace Kintai
                 app.UseDeveloperExceptionPage();
             }
 
+            // --- ここから追加 ---
+            // ルートアクセス (/) 時に Login.html を自動で開く設定
+            var defaultFileOptions = new DefaultFilesOptions();
+            defaultFileOptions.DefaultFileNames.Clear();
+            defaultFileOptions.DefaultFileNames.Add("Login.html"); // wwwroot/Login.html を既定ファイルに指定
+            app.UseDefaultFiles(defaultFileOptions); // 必ず UseStaticFiles より前に呼ぶ
+            // --- ここまで追加 ---
+
             app.UseStaticFiles();
             app.UseCookiePolicy();
 
-            // 認証ミドルウェア (必ず UseMvc より前)
+            // 認証ミドルウェア (必ず UseMvc の直前に追加)
             app.UseAuthentication();
 
             app.UseMvc(routes =>
             {
+                // デフォルトルートを LoginController の Login アクションに設定
                 routes.MapRoute(
                     name: "default",
-                    template: "{controller=Login}/{action=Index}/{id?}"); // 初期画面をログイン画面に設定
+                    template: "{controller=Login}/{action=Login}/{id?}");
             });
 
             // アプリ起動時に DB 作成とテスト社員の登録を実行
