@@ -299,5 +299,178 @@ namespace KintaiSystem.Services
                 DailyList = dailyList
             };
         }
+
+        /// <summary>
+        /// SC-09: 全社員の月次勤怠を集計し、monthly_summaries テーブルに同期した上で結果を返す
+        /// </summary>
+        public async Task<MonthlySummaryResponseDto> GetOrCalculateMonthlySummaryAsync(string targetYearMonth)
+        {
+            // 1. 年月の検証と月初・月末の確定 ("2026-10" -> 2026/10/01 〜 2026/10/31)
+            if (!DateTime.TryParse($"{targetYearMonth}-01", out var monthStart))
+            {
+                throw new ArgumentException("年月の形式が不正です。(例: 2026-10)", nameof(targetYearMonth));
+            }
+            var monthEnd = monthStart.AddMonths(1).AddDays(-1);
+
+            // 2. 会社休日の取得 (company_holidays)
+            var holidayDates = await _context.CompanyHolidays
+                .Where(h => h.HolidayDate >= monthStart && h.HolidayDate <= monthEnd)
+                .Select(h => h.HolidayDate.Date)
+                .ToListAsync();
+            var holidaySet = new HashSet<DateTime>(holidayDates);
+
+            // 3. 全社員を社員番号昇順で取得（未勤務者もCSV・一覧に出力するため全件取得）
+            var employees = await _context.Employees
+                .OrderBy(e => e.EmployeeNumber)
+                .ToListAsync();
+
+            // 4. 対象月の確定済み勤務データ（出退勤あり）と休憩データを一括取得
+            var attendances = await _context.DailyAttendances
+                .Include(d => d.BreakTimes)
+                .Where(d => d.WorkDate >= monthStart && 
+                            d.WorkDate <= monthEnd && 
+                            d.ClockInTime.HasValue && 
+                            d.ClockOutTime.HasValue)
+                .ToListAsync();
+
+            // 5. 既存の月次集計レコード取得（Upsert判定用）
+            var existingSummaries = await _context.MonthlySummaries
+                .Where(m => m.TargetYearMonth == targetYearMonth)
+                .ToListAsync();
+
+            var response = new MonthlySummaryResponseDto
+            {
+                TargetYearMonth = targetYearMonth,
+                TotalEmployeeCount = employees.Count
+            };
+
+            int overallTotalWorkMinutes = 0;
+            int overallTotalOvertimeMinutes = 0;
+
+            // 6. 各社員ごとの集計処理
+            foreach (var emp in employees)
+            {
+                var empAttendances = attendances.Where(d => d.EmployeeId == emp.Id).ToList();
+
+                int workDays = 0;
+                int holidayWorkDays = 0;
+                int empTotalWorkMinutes = 0;
+                int empTotalOvertimeMinutes = 0;
+                int empTotalMidnightMinutes = 0;
+                int empTotalHolidayWorkMinutes = 0;
+                bool hasAdjustmentWarning = false;
+
+                foreach (var daily in empAttendances)
+                {
+                    // 土日または会社休日に合致するか（日跨ぎは出勤日基準）
+                    bool isHoliday = daily.WorkDate.DayOfWeek == DayOfWeek.Saturday ||
+                                     daily.WorkDate.DayOfWeek == DayOfWeek.Sunday ||
+                                     holidaySet.Contains(daily.WorkDate.Date);
+
+                    if (isHoliday)
+                    {
+                        holidayWorkDays++;
+                    }
+                    else
+                    {
+                        workDays++;
+                    }
+
+                    // 完了している休憩のリスト作成
+                    var breakList = daily.BreakTimes
+                        .Where(b => b.BreakEndTime.HasValue)
+                        .Select(b => (b.BreakStartTime, b.BreakEndTime.Value));
+
+                    // 先ほど作成した AttendanceCalculator で日次計算
+                    var calcResult = AttendanceCalculator.Calculate(
+                        daily.ClockInTime.Value,
+                        daily.ClockOutTime.Value,
+                        breakList,
+                        isHoliday);
+
+                    empTotalWorkMinutes += (int)calcResult.WorkHours.TotalMinutes;
+                    empTotalOvertimeMinutes += (int)calcResult.OvertimeHours.TotalMinutes;
+                    empTotalMidnightMinutes += (int)calcResult.MidnightHours.TotalMinutes;
+                    empTotalHolidayWorkMinutes += (int)calcResult.HolidayWorkHours.TotalMinutes;
+
+                    if (calcResult.HasBreakAdjustment)
+                    {
+                        hasAdjustmentWarning = true;
+                    }
+                }
+
+                // 全体サマリーへの加算
+                overallTotalWorkMinutes += empTotalWorkMinutes;
+                overallTotalOvertimeMinutes += empTotalOvertimeMinutes;
+
+                string workHoursStr = FormatMinutes(empTotalWorkMinutes);
+                string overtimeHoursStr = FormatMinutes(empTotalOvertimeMinutes);
+                string midnightHoursStr = FormatMinutes(empTotalMidnightMinutes);
+                string holidayHoursStr = FormatMinutes(empTotalHolidayWorkMinutes);
+
+                // レスポンスDTO行の作成
+                response.EmployeeSummaries.Add(new EmployeeMonthlySummaryRowDto
+                {
+                    EmployeeId = emp.Id,
+                    EmployeeNumber = emp.EmployeeNumber,
+                    EmployeeName = emp.Name,
+                    WorkDays = workDays,
+                    HolidayWorkDays = holidayWorkDays,
+                    TotalWorkHours = workHoursStr,
+                    TotalOvertimeHours = overtimeHoursStr,
+                    TotalMidnightHours = midnightHoursStr,
+                    TotalHolidayWorkHours = holidayHoursStr,
+                    HasBreakAdjustmentWarning = hasAdjustmentWarning
+                });
+
+                // monthly_summaries テーブルの同期（Upsert）
+                var summaryRecord = existingSummaries.FirstOrDefault(s => s.EmployeeId == emp.Id);
+                if (summaryRecord == null)
+                {
+                    summaryRecord = new MonthlySummary
+                    {
+                        EmployeeId = emp.Id,
+                        TargetYearMonth = targetYearMonth,
+                        LockStatus = "未締め（編集可）"
+                    };
+                    _context.MonthlySummaries.Add(summaryRecord);
+                }
+
+                // 締め済みでロックされていない場合のみ最新集計値で更新
+                if (summaryRecord.LockStatus != "締め済み（ロック）")
+                {
+                    summaryRecord.WorkDays = workDays;
+                    summaryRecord.HolidayWorkDays = holidayWorkDays;
+                    summaryRecord.TotalWorkHours = workHoursStr;
+                    summaryRecord.TotalOvertimeHours = overtimeHoursStr;
+                    summaryRecord.TotalMidnightHours = midnightHoursStr;
+                    summaryRecord.TotalHolidayWorkHours = holidayHoursStr;
+                }
+            }
+
+            // DBへ一括保存
+            await _context.SaveChangesAsync();
+
+            // 全体サマリー値の設定
+            response.OverallTotalWorkHours = FormatMinutes(overallTotalWorkMinutes);
+            response.OverallTotalOvertimeHours = FormatMinutes(overallTotalOvertimeMinutes);
+
+            // 締め状態判定（1件でも締めデータが存在する場合はロック扱い）
+            bool isClosed = existingSummaries.Any(s => s.LockStatus == "締め済み（ロック）");
+            response.IsClosed = isClosed;
+            response.LockStatus = isClosed ? "締め済み（ロック）" : "未締め（編集可）";
+
+            return response;
+        }
+
+        /// <summary>
+        /// 分数を "H:mm"（分2桁固定）に整形するヘルパー
+        /// </summary>
+        private static string FormatMinutes(int totalMinutes)
+        {
+            int hours = totalMinutes / 60;
+            int minutes = totalMinutes % 60;
+            return $"{hours}:{minutes:D2}";
+        }
     }
 }
