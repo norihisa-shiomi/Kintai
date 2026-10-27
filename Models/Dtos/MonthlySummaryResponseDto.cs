@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-namespace Kintai.Models.Dtos
+namespace KintaiSystem.Models.Dtos
 {
     /// <summary>
     /// SC-09 月次集計画面 レスポンスDTO
