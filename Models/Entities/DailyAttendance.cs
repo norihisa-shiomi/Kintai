@@ -13,7 +13,7 @@ namespace KintaiSystem.Models.Entities
         public DateTime? ClockInTime { get; set; }
         public DateTime? ClockOutTime { get; set; }
 
-        public bool IsClosed { get; set; } = false; 
+        //public bool IsClosed { get; set; } = false; 
         public ICollection<BreakTime> BreakTimes { get; set; } = new List<BreakTime>();
         public ICollection<TimeStamp> TimeStamps { get; set; } = new List<TimeStamp>();
     }

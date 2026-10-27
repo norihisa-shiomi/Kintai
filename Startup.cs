@@ -12,6 +12,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.EntityFrameworkCore;
 using KintaiSystem.Data;
 using KintaiSystem.Services;
+using KintaiSystem.Services.Interfaces;
 
 namespace Kintai
 {
@@ -42,6 +43,7 @@ namespace Kintai
                 options.UseSqlite("Data Source=kintai.db"));
 
             // 2. 打刻サービスの登録
+            services.AddScoped<IAttendanceService, AttendanceService>();
             services.AddScoped<AttendanceService>();
         }
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
