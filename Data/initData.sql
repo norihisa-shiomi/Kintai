@@ -34,7 +34,7 @@ CREATE TABLE employees (
     employee_number TEXT NOT NULL UNIQUE,   -- 社員番号 (5桁: E0001等)
     name            TEXT NOT NULL,          -- 氏名
     email           TEXT NOT NULL UNIQUE,   -- ログイン用メールアドレス
-    password_hash   TEXT NOT NULL,          -- 暗号化ハッシュ化保存
+    password_hash   TEXT ,          -- 暗号化ハッシュ化保存
     is_admin        INTEGER NOT NULL DEFAULT 0, -- 管理者フラグ (0:一般, 1:管理者)
     is_first_login  INTEGER NOT NULL DEFAULT 1, -- 初回ログインフラグ (0:完了, 1:初回)
     created_at      TEXT NOT NULL DEFAULT (DATETIME('now', 'localtime')),
@@ -160,22 +160,42 @@ INSERT OR REPLACE INTO company_holidays (holiday_date, holiday_name) VALUES
     ('2026-10-04', '日曜日'),
     ('2026-10-10', '土曜日'),
     ('2026-10-11', '日曜日'),
+    ('2026-10-25', '日曜日'),
     ('2026-10-17', '土曜日'),
     ('2026-10-18', '日曜日'),
     ('2026-10-24', '土曜日'),
     ('2026-10-25', '日曜日'),
-    ('2026-10-31', '土曜日');
+    ('2026-10-31', '土曜日'),
+    ('2026-11-01', '日曜日'),
+    ('2026-11-07', '土曜日'),
+    ('2026-11-08', '日曜日'),
+    ('2026-11-14', '土曜日'),
+    ('2026-11-15', '日曜日'),
+    ('2026-11-21', '土曜日'),
+    ('2026-11-22', '日曜日'),
+    ('2026-11-28', '土曜日'),
+    ('2026-11-29', '日曜日'),
+    ('2026-12-05', '土曜日'),
+    ('2026-12-06', '日曜日'),
+    ('2026-12-12', '土曜日'),
+    ('2026-12-13', '日曜日'),
+    ('2026-12-19', '土曜日'),
+    ('2026-12-20', '日曜日'),
+    ('2026-12-29', '年末年始'),
+    ('2026-12-30', '年末年始'),
+    ('2026-12-31', '年末年始'),
+    ('2027-01-01', '年末年始'),
+    ('2027-01-02', '年末年始'),
+    ('2027-01-03', '年末年始');
 
 -- 2. 社員マスターデータ
 INSERT OR REPLACE INTO employees (id, employee_number, name, email, password_hash, is_admin, is_first_login) VALUES
-    (1, 'E0001', '小田切 誠',   'odagiri@tsubame-note.example',       '1234567890', 1, 0),
-    (2, 'E0002', '浅見 さやか', 'asami@tsubame-note.example',         '1234567890', 0, 1),
-    (3, 'E0003', '久遠 拓海',   'kuon@tsubame-note.example',          '1234567890', 0, 0),
-    (4, 'E0004', '早乙女 陽菜', 'saotome@tsubame-note.example',       '1234567890', 1, 0),
-    (5, 'E0005', '鳴海 大地',   'narumi@tsubame-note.example',        '1234567890', 1, 0),
-    (6, 'E1000', '藍染友愛',    'aizen.tomoka@tsubame-note.example',  '1234567890', 1, 0),
-    (7, 'E1001', '下垣海斗',    'shitagaki@tsubame-note.example',     '1234567890', 1, 0),
-    (8, 'E0102', '塩見宜久',    'shiomi@tsubame-note.example',        '1234567890', 1, 0);
+    (1, 'E0001', '小田切 誠',   'odagiri@tsubame-note.example',       '', 1, 0),
+    (2, 'E0002', '浅見 さやか', 'asami@tsubame-note.example',         '', 1, 0),
+    (3, 'E0003', '久遠 拓海',   'kuon@tsubame-note.example',          '', 0, 0),
+    (4, 'E0004', '早乙女 陽菜', 'saotome@tsubame-note.example',       '', 0, 0),
+    (5, 'E0005', '鳴海 大地',   'narumi@tsubame-note.example',        '', 0, 0);
+
 
 -- 3. 日次勤務 & 休憩時間データ（社員ID: 2 用）
 INSERT OR REPLACE INTO daily_attendances (id, employee_id, work_date, day_of_week, clock_in_time, clock_out_time, break_time, work_hours, overtime_hours, midnight_hours, holiday_work_hours, current_status) VALUES
