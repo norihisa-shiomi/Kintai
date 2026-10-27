@@ -78,10 +78,10 @@ formLogin.addEventListener("submit", async (e) => {
         if (response.ok && result.isSuccess) {
             if (result.isFirstLogin) {
                 // 初回ログイン時は 初回ログインへ遷移
-                window.location.href = "/firstlogin.html";
+                window.location.href = "/index.html";
             } else {
                 // 通常ログイン成功時は 打刻画面へ遷移
-                window.location.href = "/timestamp.html";
+                window.location.href = "/index.html";
             }
         } else {
             // 認証エラー (E-0005) の赤文字表示

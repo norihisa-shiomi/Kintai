@@ -19,6 +19,19 @@ namespace KintaiSystem.Data
         {
             base.OnModelCreating(modelBuilder);
 
+            // employees テーブルと各カラム名の物理マッピング
+            modelBuilder.Entity<Employee>(entity =>
+            {
+                entity.ToTable("employees");
+                entity.Property(e => e.Id).HasColumnName("id");
+                entity.Property(e => e.EmployeeNumber).HasColumnName("employee_number");
+                entity.Property(e => e.Name).HasColumnName("name");
+                entity.Property(e => e.Email).HasColumnName("email");
+                entity.Property(e => e.PasswordHash).HasColumnName("password_hash");
+                entity.Property(e => e.IsAdmin).HasColumnName("is_admin");
+                entity.Property(e => e.IsFirstLogin).HasColumnName("is_first_login");
+            });
+
             // リレーションシップの設定
             modelBuilder.Entity<DailyAttendance>()
                 .HasMany(d => d.BreakTimes)

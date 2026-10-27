@@ -50,15 +50,7 @@ namespace KintaiSystem.Controllers
 
             var employee = await _context.Employees.FirstOrDefaultAsync(e => e.Email == model.Email);
 
-            // ▼ ここから追加
-            Console.WriteLine($"[調査ログ] 画面から届いたEmail: '{model.Email}'");
-            Console.WriteLine($"[調査ログ] 取得結果: {(employee == null ? "NULL (見つからない)" : "取得成功")}");
-            if (employee != null)
-            {
-                Console.WriteLine($"[調査ログ] DBから読み取ったIsFirstLoginの値: {employee.IsFirstLogin}");
-            }
-            // ▲ ここまで追加
-
+            // 該当ユーザー不在、または初回ログイン済み (IsFirstLogin == false) の場合は E-0005
             if (employee == null || !employee.IsFirstLogin)
             {
                 return BadRequest(new
@@ -80,7 +72,7 @@ namespace KintaiSystem.Controllers
             return Ok(new
             {
                 isSuccess = true,
-                redirectUrl = "/timestamp.html"
+                redirectUrl = "/index.html"
             });
         }
 

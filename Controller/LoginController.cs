@@ -1,4 +1,7 @@
+using System;
+using System.Collections.Generic;
 using System.Security.Claims;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Mvc;
@@ -7,11 +10,12 @@ using KintaiSystem.Services;
 
 namespace KintaiSystem.Controllers
 {
-    public class LoginController : Controller
+    [ApiController]
+    [Route("api/[controller]")]
+    public class LoginController : ControllerBase
     {
         private readonly LoginService _loginService;
 
-        //エラーコードに対応する文言定義
         private static readonly Dictionary<string, string> ErrorMessages = new()
         {
             { "E-0001", "入力内容をご確認のうえ、再度入力してください。" },
@@ -27,33 +31,24 @@ namespace KintaiSystem.Controllers
             _loginService = loginService;
         }
 
-        //ログイン画面初期表示
-        [HttpGet]
-        public IActionResult Login()
-        {
-            return View(new LoginViewModel());
-        }
-
-        //ログインボタン押下時の認証処理
+        // POST: /api/login
         [HttpPost]
-        [ValidateAntiForgeryToken]   //攻撃を防ぐセキュリティトークンを検証
-        public async Task<IActionResult> Login(LoginViewModel model)
+        public async Task<IActionResult> Login([FromBody] LoginViewModel model)
         {
             if (!ModelState.IsValid)
             {
-                return View(model);
+                return BadRequest(new { isSuccess = false, errorCode = "E-0001", message = ErrorMessages["E-0001"] });
             }
 
             var result = await _loginService.AuthenticateAsync(model);
-            // 失敗した場合エラーを返す
+
             if (!result.IsSuccess || result.Employee == null)
             {
                 var errorCode = result.ErrorCode ?? "E-0005";
-                model.ErrorMessage = ErrorMessages.TryGetValue(errorCode, out var message) ? message : errorCode;
-                return View(model);
+                var message = ErrorMessages.TryGetValue(errorCode, out var msg) ? msg : errorCode;
+                return BadRequest(new { isSuccess = false, errorCode = errorCode, message = message });
             }
 
-            // 認証に成功したユーザーの属性情報を Claim（身元証明の項目） として組み立て
             var claims = new List<Claim>
             {
                 new Claim(ClaimTypes.NameIdentifier, result.Employee.Id.ToString()),
@@ -62,7 +57,6 @@ namespace KintaiSystem.Controllers
                 new Claim(ClaimTypes.Role, result.Employee.IsAdmin ? "Admin" : "User")
             };
 
-            //サインイン処理 (認証クッキー発行)
             var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
 
             await HttpContext.SignInAsync(
@@ -72,20 +66,18 @@ namespace KintaiSystem.Controllers
 
             if (result.IsFirstLogin)
             {
-                return RedirectToAction("Index", "FirstLogin");
+                return Ok(new { isSuccess = true, isFirstLogin = true, redirectUrl = "/firstlogin.html" });
             }
 
-            //打刻画面への遷移
-            return Redirect("/index.html"); 
+            return Ok(new { isSuccess = true, isFirstLogin = false, redirectUrl = "/timestamp.html" });
         }
 
-        //ログアウト処理
-        [HttpPost]
-        [ValidateAntiForgeryToken]
+        // POST: /api/login/logout
+        [HttpPost("logout")]
         public async Task<IActionResult> Logout()
         {
             await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
-            return RedirectToAction(nameof(Login));
+            return Ok(new { isSuccess = true, redirectUrl = "/login.html" });
         }
     }
 }

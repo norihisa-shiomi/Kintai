@@ -95,10 +95,10 @@ namespace Kintai
 
             app.UseMvc(routes =>
             {
-                // デフォルトルートを LoginController の Login アクションに設定
-                routes.MapRoute(
-                    name: "default",
-                    template: "{controller=Login}/{action=Login}/{id?}");
+            // デフォルトルートを LoginController の Login アクションに設定
+            routes.MapRoute(
+                name: "default",
+                template: "{controller=Login}/{action=Login}/{id?}");
             });
 
             // アプリ起動時に DB 作成とテスト社員の登録を実行
