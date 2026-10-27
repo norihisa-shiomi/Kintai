@@ -45,7 +45,7 @@ namespace KintaiSystem.Controllers
             }
 
             var result = await _loginService.AuthenticateAsync(model);
-
+            // 失敗した場合エラーを返す
             if (!result.IsSuccess || result.Employee == null)
             {
                 var errorCode = result.ErrorCode ?? "E-0005";
@@ -53,6 +53,7 @@ namespace KintaiSystem.Controllers
                 return View(model);
             }
 
+            // 認証に成功したユーザーの属性情報を Claim（身元証明の項目） として組み立て
             var claims = new List<Claim>
             {
                 new Claim(ClaimTypes.NameIdentifier, result.Employee.Id.ToString()),
@@ -78,6 +79,7 @@ namespace KintaiSystem.Controllers
             return Redirect("/index.html"); 
         }
 
+        //ログアウト処理
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Logout()
