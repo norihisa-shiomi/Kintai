@@ -11,7 +11,7 @@ namespace KintaiSystem.Controllers
     {
         private readonly LoginService _loginService;
 
-        //エラーコードに対応する文言定義辞書
+        //エラーコードに対応する文言定義
         private static readonly Dictionary<string, string> ErrorMessages = new()
         {
             { "E-0001", "入力内容をご確認のうえ、再度入力してください。" },
@@ -36,7 +36,7 @@ namespace KintaiSystem.Controllers
 
         //ログインボタン押下時の認証処理
         [HttpPost]
-        [ValidateAntiForgeryToken]
+        [ValidateAntiForgeryToken]   //攻撃を防ぐセキュリティトークンを検証
         public async Task<IActionResult> Login(LoginViewModel model)
         {
             if (!ModelState.IsValid)

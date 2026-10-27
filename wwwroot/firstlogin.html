@@ -3,9 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <!-- 設計: 7. 画面タイトル -->
     <title>初回ログイン | 勤怠管理システム</title>
-    <!-- 打刻画面・ログイン画面と同一のスタイルシート構成 -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="css/kintai.css">
 </head>
@@ -13,22 +11,22 @@
 
 <div class="container py-5" style="max-width: 480px;">
 
-    <!-- 初回ログインメインカード (SC-02) -->
+    <!-- 初回ログインメインカード -->
     <div class="card shadow-sm border-0 mb-4">
-        <!-- 設計: 7. 画面タイトル ヘッダー表示 -->
+        <!-- 画面タイトル -->
         <div class="card-header bg-primary text-white py-3">
             <h5 class="mb-0 fw-bold">勤怠管理システム初回ログイン</h5>
         </div>
 
         <div class="card-body p-4">
 
-            <!-- 設計: 5. 業務エラーメッセージ (E-0005等の認証失敗エラーを赤文字枠で表示) -->
+            <!-- 業務エラーメッセージ (E-0005等の認証失敗エラーを赤文字枠で表示) -->
             <div id="alert-error" class="alert alert-danger d-none py-2 mb-3 text-start fs-7" role="alert"></div>
 
             <!-- 初回ログインフォーム -->
             <form id="form-first-login" novalidate>
 
-                <!-- 設計: 1. メールアドレス 入力項目 -->
+                <!-- メールアドレス 入力項目 -->
                 <div class="mb-3 text-start">
                     <label for="input-email" class="form-label fw-bold text-muted small mb-1">
                         メールアドレス <span class="badge bg-danger ms-1">必須</span>
@@ -41,11 +39,11 @@
                         placeholder="example@domain.com" 
                         autocomplete="email"
                     />
-                    <!-- 設計: 5. 入力チェック (E-0001, E-0003 のバリデーションメッセージを項目の下に赤文字で表示) -->
+                    <!--  入力チェック (E-0001, E-0003 のバリデーションメッセージを項目の下に赤文字で表示) -->
                     <div id="error-email" class="text-danger small mt-1 d-none"></div>
                 </div>
 
-                <!-- 設計: 2. 初回パスワード入力 項目 (8〜32桁、英数記号必須) -->
+                <!-- 初回パスワード入力 項目 (8〜32桁、英数記号必須) -->
                 <div class="mb-3 text-start">
                     <label for="input-new-password" class="form-label fw-bold text-muted small mb-1">
                         初回パスワード入力 <span class="badge bg-danger ms-1">必須</span>
@@ -58,11 +56,11 @@
                         placeholder="8〜32桁の英数記号" 
                         autocomplete="new-password"
                     />
-                    <!-- 設計: 5. 入力チェック (E-0001, E-0002, E-0004 のバリデーションメッセージを項目の下に赤文字で表示) -->
+                    <!-- 入力チェック (E-0001, E-0002, E-0004 のバリデーションメッセージを項目の下に赤文字で表示) -->
                     <div id="error-new-password" class="text-danger small mt-1 d-none"></div>
                 </div>
 
-                <!-- 設計: 3. 初回パスワード確認 項目 (No.2と同一のパスワード) -->
+                <!-- 初回パスワード確認 項目 (No.2と同一のパスワード) -->
                 <div class="mb-4 text-start">
                     <label for="input-confirm-password" class="form-label fw-bold text-muted small mb-1">
                         初回パスワード確認 <span class="badge bg-danger ms-1">必須</span>
@@ -75,11 +73,11 @@
                         placeholder="もう一度パスワードを入力" 
                         autocomplete="new-password"
                     />
-                    <!-- 設計: 5. 入力チェック (E-0001, E-0006 のバリデーションメッセージを項目の下に赤文字で表示) -->
+                    <!-- 入力チェック (E-0001, E-0006 のバリデーションメッセージを項目の下に赤文字で表示) -->
                     <div id="error-confirm-password" class="text-danger small mt-1 d-none"></div>
                 </div>
 
-                <!-- 設計: 4. ログインボタン (初回登録・認証実行) -->
+                <!--  ログインボタン (初回登録・認証実行) -->
                 <div class="mb-3">
                     <button 
                         type="submit" 
@@ -89,7 +87,7 @@
                     </button>
                 </div>
 
-                <!-- 設計: 6. 戻るボタン (ログイン画面に戻る) -->
+                <!--  戻るボタン (ログイン画面に戻る) -->
                 <div class="mb-2">
                     <a href="/Login.html" id="btn-back" class="btn btn-outline-secondary w-100 py-2 fw-bold">
                         戻る
@@ -100,7 +98,6 @@
     </div>
 </div>
 
-<!-- 設計: 外部JavaScriptファイルの読み込み -->
 <script src="js/firstlogin.js"></script>
 </body>
 </html>

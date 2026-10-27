@@ -3,9 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <!-- 設計: 6. 画面タイトル -->
     <title>ログイン | 勤怠管理システム</title>
-    <!-- 打刻画面と同一のスタイルシート構成 -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="css/kintai.css">
 </head>
@@ -15,20 +13,20 @@
 
     <!-- ログインメインカード (SC-01) -->
     <div class="card shadow-sm border-0 mb-4">
-        <!-- 設計: 6. 画面タイトル ヘッダー表示 -->
+        <!-- 画面タイトル -->
         <div class="card-header bg-primary text-white py-3">
             <h5 class="mb-0 fw-bold">勤怠管理システムログイン</h5>
         </div>
 
         <div class="card-body p-4">
 
-            <!-- 設計: 4. 業務エラーメッセージ (E-0005等の認証失敗エラーを赤文字枠で表示) -->
+            <!-- 業務エラーメッセージ (E-0005等の認証失敗エラーを赤文字枠で表示) -->
             <div id="alert-error" class="alert alert-danger d-none py-2 mb-3 text-start fs-7" role="alert"></div>
 
             <!-- ログインフォーム -->
             <form id="form-login" novalidate>
 
-                <!-- 設計: 1. メールアドレス 入力項目 -->
+                <!-- メールアドレス 入力項目 -->
                 <div class="mb-3 text-start">
                     <label for="input-email" class="form-label fw-bold text-muted small mb-1">
                         メールアドレス <span class="badge bg-danger ms-1">必須</span>
@@ -41,11 +39,11 @@
                         placeholder="example@domain.com" 
                         autocomplete="email"
                     />
-                    <!-- 設計: 5. 入力チェック (E-0001, E-0003 のバリデーションメッセージを項目の下に赤文字で表示) -->
+                    <!-- 入力チェック (E-0001, E-0003 のバリデーションメッセージを項目の下に赤文字で表示) -->
                     <div id="error-email" class="text-danger small mt-1 d-none"></div>
                 </div>
 
-                <!-- 設計: 2. パスワード 入力項目 (8〜32桁、英数記号必須) -->
+                <!-- パスワード 入力項目 (8〜32桁、英数記号必須) -->
                 <div class="mb-4 text-start">
                     <label for="input-password" class="form-label fw-bold text-muted small mb-1">
                         パスワード <span class="badge bg-danger ms-1">必須</span>
@@ -58,11 +56,11 @@
                         placeholder="8〜32桁の英数記号" 
                         autocomplete="current-password"
                     />
-                    <!-- 設計: 5. 入力チェック (E-0001, E-0002, E-0004 のバリデーションメッセージを項目の下に赤文字で表示) -->
+                    <!-- 入力チェック (E-0001, E-0002, E-0004 のバリデーションメッセージを項目の下に赤文字で表示) -->
                     <div id="error-password" class="text-danger small mt-1 d-none"></div>
                 </div>
 
-                <!-- 設計: 3. ログインボタン (ログイン実行) -->
+                <!-- ログインボタン (ログイン実行) -->
                 <div class="mb-3">
                     <button 
                         type="submit" 
@@ -77,7 +75,7 @@
 
                 <hr class="my-4" />
 
-                <!-- 設計: 5. 初回ログインリンク (SC-02 初回ログイン画面への遷移) -->
+                <!-- 初回ログインリンク -->
                 <div class="text-center">
                     <a href="/firstlogin.html" id="link-first-login" class="text-decoration-none small text-primary fw-bold">
                         初回ログイン時はこちら

@@ -19,7 +19,7 @@ namespace KintaiSystem.Controllers
         private readonly AppDbContext _context;
         private readonly IPasswordHasher<Employee> _passwordHasher;
 
-        // 設計: エラーコードに対応する文言定義辞書
+        // 設計: エラーコードに対応する文言定義
         private static readonly Dictionary<string, string> ErrorMessages = new()
         {
             { "E-0001", "入力内容をご確認のうえ、再度入力してください。" },
