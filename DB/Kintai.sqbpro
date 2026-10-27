@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><sqlb_project><db path="Kintai.db" readonly="0" foreign_keys="1" case_sensitive_like="0" temp_store="0" wal_autocheckpoint="1000" synchronous="2"/><attached/><window><main_tabs open="structure browser pragmas query" current="1"/></window><tab_structure><column_width id="0" width="300"/><column_width id="1" width="0"/><column_width id="2" width="100"/><column_width id="3" width="5424"/><column_width id="4" width="0"/><expanded_item id="0" parent="1"/><expanded_item id="1" parent="1"/><expanded_item id="2" parent="1"/><expanded_item id="3" parent="1"/></tab_structure><tab_browse><table title="company_holidays" custom_title="0" dock_id="3" table="4,16:maincompany_holidays"/><table title="company_holidays" custom_title="0" dock_id="2" table="4,16:maincompany_holidays"/><table title="attendance_audit_logs" custom_title="0" dock_id="1" table="4,21:mainattendance_audit_logs"/><table title="company_holidays" custom_title="0" dock_id="4" table="4,16:maincompany_holidays"/><dock_state state="000000ff00000000fd00000001000000020000024900000217fc0100000001fc00000000000002490000013400fffffffa000000030100000004fb000000160064006f0063006b00420072006f00770073006500310100000000ffffffff0000013400fffffffb000000160064006f0063006b00420072006f00770073006500320100000000ffffffff0000013400fffffffb000000160064006f0063006b00420072006f00770073006500330100000000ffffffff0000013400fffffffb000000160064006f0063006b00420072006f00770073006500340100000000ffffffff0000013400ffffff000002490000000000000004000000040000000800000008fc00000000"/><default_encoding codec=""/><browse_table_settings><table schema="main" name="attendance_audit_logs" show_row_id="0" encoding="" plot_x_axis="" unlock_view_pk="_rowid_" freeze_columns="0"><sort/><column_widths><column index="1" value="32"/><column index="2" value="150"/><column index="3" value="126"/><column index="4" value="76"/><column index="5" value="120"/><column index="6" value="111"/><column index="7" value="88"/><column index="8" value="85"/></column_widths><filter_values/><conditional_formats/><row_id_formats/><display_formats/><hidden_columns/><plot_y_axes/><global_filter/></table><table schema="main" name="company_holidays" show_row_id="0" encoding="" plot_x_axis="" unlock_view_pk="_rowid_" freeze_columns="0"><sort/><column_widths><column index="1" value="87"/><column index="2" value="87"/><column index="3" value="159"/></column_widths><filter_values/><conditional_formats/><row_id_formats/><display_formats/><hidden_columns/><plot_y_axes/><global_filter/></table></browse_table_settings></tab_browse><tab_sql><sql name="SQL 1*">-- ====================================================================
+<?xml version="1.0" encoding="UTF-8"?><sqlb_project><db path="Kintai.db" readonly="0" foreign_keys="1" case_sensitive_like="0" temp_store="0" wal_autocheckpoint="1000" synchronous="2"/><attached/><window><main_tabs open="structure browser pragmas query" current="1"/></window><tab_structure><column_width id="0" width="300"/><column_width id="1" width="0"/><column_width id="2" width="100"/><column_width id="3" width="5424"/><column_width id="4" width="0"/><expanded_item id="0" parent="1"/><expanded_item id="1" parent="1"/><expanded_item id="2" parent="1"/><expanded_item id="3" parent="1"/></tab_structure><tab_browse><table title="employees" custom_title="0" dock_id="2" table="4,9:mainemployees"/><table title="attendance_audit_logs" custom_title="0" dock_id="1" table="4,21:mainattendance_audit_logs"/><table title="company_holidays" custom_title="0" dock_id="3" table="4,16:maincompany_holidays"/><dock_state state="000000ff00000000fd0000000100000002000005bc0000039afc0100000001fc00000000000005bc0000013400fffffffa000000020100000003fb000000160064006f0063006b00420072006f00770073006500310100000000ffffffff0000013400fffffffb000000160064006f0063006b00420072006f00770073006500320100000000ffffffff0000013400fffffffb000000160064006f0063006b00420072006f00770073006500330100000000ffffffff0000013400ffffff000002870000000000000004000000040000000800000008fc00000000"/><default_encoding codec=""/><browse_table_settings><table schema="main" name="attendance_audit_logs" show_row_id="0" encoding="" plot_x_axis="" unlock_view_pk="_rowid_" freeze_columns="0"><sort/><column_widths><column index="1" value="32"/><column index="2" value="150"/><column index="3" value="126"/><column index="4" value="76"/><column index="5" value="120"/><column index="6" value="111"/><column index="7" value="88"/><column index="8" value="85"/></column_widths><filter_values/><conditional_formats/><row_id_formats/><display_formats/><hidden_columns/><plot_y_axes/><global_filter/></table><table schema="main" name="company_holidays" show_row_id="0" encoding="" plot_x_axis="" unlock_view_pk="_rowid_" freeze_columns="0"><sort/><column_widths><column index="1" value="87"/><column index="2" value="87"/><column index="3" value="159"/></column_widths><filter_values/><conditional_formats/><row_id_formats/><display_formats/><hidden_columns/><plot_y_axes/><global_filter/></table><table schema="main" name="employees" show_row_id="0" encoding="" plot_x_axis="" unlock_view_pk="_rowid_" freeze_columns="0"><sort/><column_widths><column index="1" value="32"/><column index="2" value="112"/><column index="3" value="80"/><column index="4" value="231"/><column index="5" value="97"/><column index="6" value="59"/><column index="7" value="84"/><column index="8" value="159"/><column index="9" value="159"/></column_widths><filter_values/><conditional_formats/><row_id_formats/><display_formats/><hidden_columns/><plot_y_axes/><global_filter/></table></browse_table_settings></tab_browse><tab_sql><sql name="SQL 1*">-- ====================================================================
 
 -- 勤怠管理システム データベース初期化＆全データ投入スクリプト
 
@@ -70,7 +70,7 @@ CREATE TABLE employees (
 
     email           TEXT NOT NULL UNIQUE,   -- ログイン用メールアドレス
 
-    password_hash   TEXT NOT NULL,          -- 暗号化ハッシュ化保存
+    password_hash   TEXT ,          -- 暗号化ハッシュ化保存
 
     is_admin        INTEGER NOT NULL DEFAULT 0, -- 管理者フラグ (0:一般, 1:管理者)
 
@@ -322,6 +322,8 @@ INSERT OR REPLACE INTO company_holidays (holiday_date, holiday_name) VALUES
 
     ('2026-10-11', '日曜日'),
 
+    ('2026-10-25', '日曜日'),
+
     ('2026-10-17', '土曜日'),
 
     ('2026-10-18', '日曜日'),
@@ -330,7 +332,49 @@ INSERT OR REPLACE INTO company_holidays (holiday_date, holiday_name) VALUES
 
     ('2026-10-25', '日曜日'),
 
-    ('2026-10-31', '土曜日');
+    ('2026-10-31', '土曜日'),
+
+    ('2026-11-01', '日曜日'),
+
+    ('2026-11-07', '土曜日'),
+
+    ('2026-11-08', '日曜日'),
+
+    ('2026-11-14', '土曜日'),
+
+    ('2026-11-15', '日曜日'),
+
+    ('2026-11-21', '土曜日'),
+
+    ('2026-11-22', '日曜日'),
+
+    ('2026-11-28', '土曜日'),
+
+    ('2026-11-29', '日曜日'),
+
+    ('2026-12-05', '土曜日'),
+
+    ('2026-12-06', '日曜日'),
+
+    ('2026-12-12', '土曜日'),
+
+    ('2026-12-13', '日曜日'),
+
+    ('2026-12-19', '土曜日'),
+
+    ('2026-12-20', '日曜日'),
+
+    ('2026-12-29', '年末年始'),
+
+    ('2026-12-30', '年末年始'),
+
+    ('2026-12-31', '年末年始'),
+
+    ('2027-01-01', '年末年始'),
+
+    ('2027-01-02', '年末年始'),
+
+    ('2027-01-03', '年末年始');
 
 
 
@@ -340,19 +384,15 @@ INSERT OR REPLACE INTO employees (id, employee_number, name, email, password_has
 
     (1, 'E0001', '小田切 誠',   'odagiri@tsubame-note.example',       '', 1, 0),
 
-    (2, 'E0002', '浅見 さやか', 'asami@tsubame-note.example',         '1234567890', 0, 1),
+    (2, 'E0002', '浅見 さやか', 'asami@tsubame-note.example',         '', 1, 0),
 
-    (3, 'E0003', '久遠 拓海',   'kuon@tsubame-note.example',          '1234567890', 0, 0),
+    (3, 'E0003', '久遠 拓海',   'kuon@tsubame-note.example',          '', 0, 0),
 
-    (4, 'E0004', '早乙女 陽菜', 'saotome@tsubame-note.example',       '1234567890', 1, 0),
+    (4, 'E0004', '早乙女 陽菜', 'saotome@tsubame-note.example',       '', 0, 0),
 
-    (5, 'E0005', '鳴海 大地',   'narumi@tsubame-note.example',        '1234567890', 1, 0),
+    (5, 'E0005', '鳴海 大地',   'narumi@tsubame-note.example',        '', 0, 0);
 
-    (6, 'E1000', '藍染友愛',    'aizen.tomoka@tsubame-note.example',  '1234567890', 1, 0),
 
-    (7, 'E1001', '下垣海斗',    'shitagaki@tsubame-note.example',     '1234567890', 1, 0),
-
-    (8, 'E0102', '塩見宜久',    'shiomi@tsubame-note.example',        '1234567890', 1, 0);
 
 
 
@@ -418,4 +458,6 @@ INSERT OR REPLACE INTO modification_requests (id, employee_id, daily_attendance_
 
 INSERT OR REPLACE INTO requested_break_times (id, modification_request_id, break_start_time, break_end_time) VALUES
 
-    (1, 1, '12:00', '13:00');</sql><current_tab id="0"/></tab_sql></sqlb_project>
+    (1, 1, '12:00', '13:00');
+
+    </sql><current_tab id="0"/></tab_sql></sqlb_project>

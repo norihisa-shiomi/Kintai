@@ -15,6 +15,7 @@ using Microsoft.AspNetCore.Identity;
 using KintaiSystem.Data;
 using KintaiSystem.Models.Entities;
 using KintaiSystem.Services;
+using KintaiSystem.Services.Interfaces;
 
 namespace Kintai
 {
@@ -54,11 +55,16 @@ namespace Kintai
             services.AddDbContext<AppDbContext>(options =>
                 options.UseSqlite("Data Source=kintai.db"));
 
+<<<<<<< HEAD
             // 2. パスワードハッシュ照合用サービスの登録
             services.AddScoped<IPasswordHasher<Employee>, PasswordHasher<Employee>>();
 
             // 3. ログインサービスおよび打刻サービスの登録
             services.AddScoped<LoginService>();
+=======
+            // 2. 打刻サービスの登録
+            services.AddScoped<IAttendanceService, AttendanceService>();
+>>>>>>> origin/main
             services.AddScoped<AttendanceService>();
         }
 

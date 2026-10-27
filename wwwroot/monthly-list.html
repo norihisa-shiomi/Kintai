@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SC-05 月次一覧 - 勤怠管理システム</title>
+    <!-- 外部CSSの読み込み -->
+    <link rel="stylesheet" href="css/monthly-list.css">
+</head>
+<body>
+
+    <!-- ヘッダー -->
+    <header class="header">
+        <h1 class="header-title">月次一覧</h1>
+        <div class="user-info">
+            <span>ログイン中: <strong id="loginUser">山田 太郎 (E0001)</strong></span>
+            <button class="btn-back" onclick="location.href='/index.html'">打刻画面へ戻る</button>
+        </div>
+    </header>
+
+    <main class="container">
+
+        <!-- コントロールパネル -->
+        <section class="control-panel">
+            <div class="selector-group">
+                <label for="monthPicker">表示年月:</label>
+                <input type="month" id="monthPicker" class="month-picker" value="2026-10" onchange="updateMonthlyData()">
+                
+                <span id="lockStatusBadge" class="status-badge open">
+                    <span id="lockStatusText">未締め（編集可）</span>
+                </span>
+            </div>
+
+            <div class="nav-buttons">
+                <button class="btn-secondary" onclick="alert('申請履歴一覧（SC-06）へ遷移します')">申請履歴一覧</button>
+            </div>
+        </section>
+
+        <!-- 月次サマリー -->
+        <section class="summary-grid">
+            <div class="summary-card">
+                <div class="summary-title">出勤日数</div>
+                <div class="summary-value" id="summaryWorkDays">20 日</div>
+            </div>
+            <div class="summary-card">
+                <div class="summary-title">休日出勤日数</div>
+                <div class="summary-value" id="summaryHolidayDays">1 日</div>
+            </div>
+            <div class="summary-card">
+                <div class="summary-title">総労働時間</div>
+                <div class="summary-value" id="summaryTotalHours">168:30</div>
+            </div>
+            <div class="summary-card">
+                <div class="summary-title">総残業時間</div>
+                <div class="summary-value" id="summaryOvertime">8:15</div>
+            </div>
+            <div class="summary-card">
+                <div class="summary-title">総深夜時間</div>
+                <div class="summary-value" id="summaryMidnight">3:00</div>
+            </div>
+            <div class="summary-card">
+                <div class="summary-title">総休日労働時間</div>
+                <div class="summary-value" id="summaryHolidayHours">9:00</div>
+            </div>
+        </section>
+
+        <!-- 月次明細テーブル -->
+        <section class="table-wrapper">
+            <table class="attendance-table">
+                <thead>
+                    <tr>
+                        <th>日付</th>
+                        <th>曜日</th>
+                        <th>出勤時間</th>
+                        <th>退勤時間</th>
+                        <th>休憩開始</th>
+                        <th>休憩終了</th>
+                        <th>労働時間</th>
+                        <th>残業時間</th>
+                        <th>深夜時間</th>
+                        <th>休日労働時間</th>
+                        <th>操作</th>
+                    </tr>
+                </thead>
+                <tbody id="attendanceTableBody">
+                    <!-- JavaScriptで動的生成 -->
+                </tbody>
+            </table>
+        </section>
+
+    </main>
+
+    <!-- 外部JavaScriptの読み込み -->
+    <script src="js/monthly-list.js"></script>
+</body>
+</html>
