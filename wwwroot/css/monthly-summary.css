@@ -1,0 +1,11 @@
+.nav-bar {
+    margin-bottom: 1rem;
+}
+.nav-bar a {
+    color: #007bff;
+    text-decoration: none;
+    font-size: 0.9rem;
+}
+.nav-bar a:hover {
+    text-decoration: underline;
+}

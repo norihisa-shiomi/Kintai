@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>月次集計 - 勤怠管理システム</title>
+    <link rel="stylesheet" href="css/monthly-summary.css">
+</head>
+<body>
+    <div class="monthly-summary-container">
+        <!-- ナビゲーション：打刻画面へ戻るボタン（設計書 SC-09 画面遷移定義） -->
+        <nav class="nav-bar" style="margin-bottom: 1rem;">
+            <button type="button" class="btn-secondary" onclick="location.href='index.html'" style="padding: 0.4rem 0.9rem; cursor: pointer; background: #6c757d; color: #fff; border: none; border-radius: 4px;">
+                &larr; 打刻画面に戻る
+            </button>
+        </nav>
+
+        <header class="summary-header">
+            <div class="d-flex align-items-center" style="display: flex; align-items: center; gap: 1rem;">
+                <h2 style="margin: 0;">月次集計</h2>
+                <span id="lockStatusBadge" class="badge-status badge-warning">-</span>
+            </div>
+
+            <!-- 設計書 SC-09 管理者用画面遷移ボタン群 -->
+            <div class="header-actions" style="display: flex; gap: 0.5rem;">
+                <button type="button" id="btnGoToClosing" class="btn-primary" style="background-color: #17a2b8;" onclick="location.href='monthly-closing.html'">締め管理へ</button>
+                <button type="button" id="btnGoToCsv" class="btn-primary" style="background-color: #28a745;" onclick="location.href='csv-export.html'">給与CSV出力</button>
+            </div>
+        </header>
+
+        <!-- 検索フォーム -->
+        <section class="search-card">
+            <div class="search-form">
+                <label for="targetYearMonth"><strong>対象年月:</strong></label>
+                <input type="month" id="targetYearMonth" class="search-input">
+                <button type="button" id="btnSearch" class="btn-primary">集計表示</button>
+            </div>
+            <div id="errorMessage" class="error-text" style="display: none;"></div>
+        </section>
+
+        <!-- 全社集計 KPI カード -->
+        <section class="cards-grid">
+            <div class="kpi-card">
+                <p class="kpi-title">対象社員数</p>
+                <p class="kpi-value" id="totalEmployeeCount">- 名</p>
+            </div>
+            <div class="kpi-card">
+                <p class="kpi-title">総実働時間</p>
+                <p class="kpi-value" id="overallTotalWorkHours">-:--</p>
+            </div>
+            <div class="kpi-card overtime">
+                <p class="kpi-title">総残業時間</p>
+                <p class="kpi-value text-danger" id="overallTotalOvertimeHours">-:--</p>
+            </div>
+        </section>
+
+        <!-- 社員別明細テーブル -->
+        <section class="table-wrapper">
+            <table class="summary-table">
+                <thead>
+                    <tr>
+                        <th>社員番号</th>
+                        <th>氏名</th>
+                        <th class="text-right">出勤日数</th>
+                        <th class="text-right">休日出勤</th>
+                        <th class="text-right">総実働</th>
+                        <th class="text-right">残業時間</th>
+                        <th class="text-right">深夜時間</th>
+                        <th class="text-right">休日労働</th>
+                        <th class="text-center">備考・警告</th>
+                    </tr>
+                </thead>
+                <tbody id="summaryTableBody">
+                    <tr>
+                        <td colspan="9" class="text-center" style="padding: 2rem; color: #6c757d;">
+                            年月を選択して「集計表示」を押してください。
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+    </div>
+
+    <script src="js/monthly-summary.js"></script>
+</body>
+</html>

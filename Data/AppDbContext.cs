@@ -14,6 +14,8 @@ namespace KintaiSystem.Data
         public DbSet<DailyAttendance> DailyAttendances { get; set; } = null!;
         public DbSet<BreakTime> BreakTimes { get; set; } = null!;
         public DbSet<TimeStamp> TimeStamps { get; set; } = null!;
+        public DbSet<CompanyHoliday> CompanyHolidays { get; set; }
+        public DbSet<MonthlySummary> MonthlySummaries { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
