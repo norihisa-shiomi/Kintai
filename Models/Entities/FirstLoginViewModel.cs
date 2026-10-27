@@ -1,6 +1,5 @@
 using System.ComponentModel.DataAnnotations;
 
-
 namespace KintaiSystem.Models.Entities
 {
     public class FirstLoginViewModel

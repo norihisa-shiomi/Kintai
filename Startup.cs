@@ -52,9 +52,12 @@ namespace Kintai
                     .SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
 
             // 1. SQLite データベースの設定
+            // services.AddDbContext<AppDbContext>(options =>
+            //     options.UseSqlite("Data Source=kintai.db"));
+            
+            // 1. SQLite データベースの設定
             services.AddDbContext<AppDbContext>(options =>
-                options.UseSqlite("Data Source=kintai.db"));
-
+                options.UseSqlite("Data Source=DB/Kintai.db"));
 
             // 2. パスワードハッシュ照合用サービスの登録
             services.AddScoped<IPasswordHasher<Employee>, PasswordHasher<Employee>>();
