@@ -190,11 +190,11 @@ INSERT OR REPLACE INTO company_holidays (holiday_date, holiday_name) VALUES
 
 -- 2. 社員マスターデータ
 INSERT OR REPLACE INTO employees (id, employee_number, name, email, password_hash, is_admin, is_first_login) VALUES
-    (1, 'E0001', '小田切 誠',   'odagiri@tsubame-note.example',       '', 1, 0),
-    (2, 'E0002', '浅見 さやか', 'asami@tsubame-note.example',         '', 1, 0),
-    (3, 'E0003', '久遠 拓海',   'kuon@tsubame-note.example',          '', 0, 0),
-    (4, 'E0004', '早乙女 陽菜', 'saotome@tsubame-note.example',       '', 0, 0),
-    (5, 'E0005', '鳴海 大地',   'narumi@tsubame-note.example',        '', 0, 0);
+    (1, 'E0001', '小田切 誠',   'odagiri@tsubame-note.example',       '', 1, 1),
+    (2, 'E0002', '浅見 さやか', 'asami@tsubame-note.example',         '', 1, 1),
+    (3, 'E0003', '久遠 拓海',   'kuon@tsubame-note.example',          '', 0, 1),
+    (4, 'E0004', '早乙女 陽菜', 'saotome@tsubame-note.example',       '', 0, 1),
+    (5, 'E0005', '鳴海 大地',   'narumi@tsubame-note.example',        '', 0, 1);
 
 
 -- 3. 日次勤務 & 休憩時間データ（社員ID: 2 用）
