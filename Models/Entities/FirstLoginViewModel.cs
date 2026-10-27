@@ -1,7 +1,7 @@
 using System.ComponentModel.DataAnnotations;
 
 
-namespace YourProjectName.Models.ViewModels
+namespace KintaiSystem.Models.Entities
 {
     public class FirstLoginViewModel
     {
