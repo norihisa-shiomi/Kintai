@@ -32,11 +32,16 @@ function updateClock() {
 // サーバーから最新の勤務状態を取得して画面に反映する関数
 async function loadCurrentStatus() {
     try {
-        const response = await fetch('/api/timestamp/status/1');
+        const response = await fetch('/api/timestamp/status');
         if (response.ok) {
             const data = await response.json();
 
             console.log('★サーバーから取得したデータ:', data);
+
+            const userNameElem = document.getElementById('login-user-name');
+            if (userNameElem && data.employeeName) {
+                userNameElem.textContent = data.employeeName;
+            }
 
             // サーバーから取得したステータスと履歴でUIを更新
             updateUI(data.currentStatus, data.history || []);
@@ -56,7 +61,6 @@ async function sendStamp(stampType) {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
-                employeeId: 1,
                 stampType: stampType
             })
         });
