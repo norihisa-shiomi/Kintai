@@ -8,7 +8,7 @@ using KintaiSystem.Services.Interfaces;
 
 namespace KintaiSystem.Controllers
 {
-    //[Authorize] // ログイン済みユーザーのみアクセス許可
+    [Authorize] // ログイン済みユーザーのみアクセス許可
     [Route("api/monthly-summary")]
     [ApiController]
     public class MonthlySummaryController : ControllerBase
@@ -34,14 +34,13 @@ namespace KintaiSystem.Controllers
             var isAdminClaim = User.FindFirst("IsAdmin")?.Value ?? User.FindFirst(ClaimTypes.Role)?.Value;
             bool isAdmin = string.Equals(isAdminClaim, "True", StringComparison.OrdinalIgnoreCase)
                         || string.Equals(isAdminClaim, "Admin", StringComparison.OrdinalIgnoreCase);
-            /*
+            
             if (!isAdmin)
             {
                 // 一般社員の直接アクセス（URL直叩きやAPI呼び出し）は403で拒否
                 return StatusCode(403, new { messageId = "E-0022", message = "アクセス権がありません。" });
         
             }
-            */
 
 
             // -------------------------------------------------------------
