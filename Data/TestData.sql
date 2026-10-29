@@ -8,7 +8,7 @@ INSERT INTO daily_attendances (
     clock_in_time,
     clock_out_time,
     break_time,
-    work_hours,
+    work_hours, 
     overtime_hours,
     midnight_hours,
     holiday_work_hours,

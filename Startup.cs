@@ -50,11 +50,7 @@ namespace Kintai
             // EndpointRouting をオフにして従来型のルーティングを許可する設定
             services.AddMvc(options => options.EnableEndpointRouting = false)
                     .SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
-
-            // 1. SQLite データベースの設定
-            // services.AddDbContext<AppDbContext>(options =>
-            //     options.UseSqlite("Data Source=kintai.db"));
-            
+          
             // 1. SQLite データベースの設定
             services.AddDbContext<AppDbContext>(options =>
                 options.UseSqlite("Data Source=DB/Kintai.db"));
