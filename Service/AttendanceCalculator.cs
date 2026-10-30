@@ -73,8 +73,10 @@ namespace Kintai.Services
 
             // 法定枠に満たない場合、不足分を自動補正（差分控除）し警告フラグをONにする
             int effectiveBreakMinutes = actualBreakMinutes;
+            int adjustedBreakMinutes = 0;
             if (actualBreakMinutes < requiredBreakMinutes)
             {
+                adjustedBreakMinutes = requiredBreakMinutes - actualBreakMinutes;
                 effectiveBreakMinutes = requiredBreakMinutes;
                 result.HasBreakAdjustment = true;
             }
@@ -85,7 +87,7 @@ namespace Kintai.Services
             result.WorkHours = TimeSpan.FromMinutes(netWorkMinutes);
 
             // 4. 深夜時間の算出 (22:00 ～ 05:00 の実労働時間・休憩時間は除外)
-            result.MidnightHours = CalculateMidnightHours(cleanIn, cleanOut, breaks);
+            result.MidnightHours = CalculateMidnightHours(cleanIn, cleanOut, breaks, adjustedBreakMinutes);
 
             // 5. 休日 vs 平日・残業判定
             if (isHoliday)
@@ -127,9 +129,10 @@ namespace Kintai.Services
         /// 22:00〜翌5:00の時間帯から休憩時間を除いた実働分数を算出
         /// </summary>
         private static TimeSpan CalculateMidnightHours(
-            DateTime cleanIn, 
-            DateTime cleanOut, 
-            List<(DateTime Start, DateTime End)> breaks)
+        DateTime cleanIn, 
+        DateTime cleanOut, 
+        List<(DateTime Start, DateTime End)> breaks,
+        int adjustedBreakMinutes)
         {
             int midnightMinutes = 0;
             DateTime current = cleanIn;
@@ -148,6 +151,12 @@ namespace Kintai.Services
                     }
                 }
                 current = current.AddMinutes(1);
+            }
+
+            // 追加: 打刻なし等で自動付与された法定休憩分がある場合、深夜分から控除
+            if (adjustedBreakMinutes > 0 && midnightMinutes > 0)
+            {
+                midnightMinutes = Math.Max(0, midnightMinutes - adjustedBreakMinutes);
             }
 
             return TimeSpan.FromMinutes(midnightMinutes);
